@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "awesome-bootstrap-checkbox": "^1.0.0",
+    "bootstrap": "^3.3.7",
+    "bootstrap-select": "^1.12.4",
+    "bootstrap3-dialog": "^1.35.4",
+    "devbridge-autocomplete": "^1.4.7",
+    "fine-uploader": "^5.15.6",
+    "flatpickr": "^4.3.2",
+    "font-awesome": "^4.7.0",
+    "inputmask": "^3.3.11",
+    "jquery": "^3.3.1",
+    "jstree": "^3.3.5",
+    "list.js": "^1.5.0",
+    "numeral": "^2.0.6",
+    "photoswipe": "^4.1.2"
+  }
+}
