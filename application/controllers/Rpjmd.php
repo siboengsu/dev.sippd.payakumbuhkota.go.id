@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Rpjmd extends CI_Controller {
-	// comment
+	
 	private $json = ['cod' => NULL, 'msg' => NULL, 'link' => NULL];
 
 	private $KDTAHUN = NULL;
@@ -28,7 +28,7 @@ class Rpjmd extends CI_Controller {
         $data['visi'] = $this->m_rpjmd->getVisi();
 		$this->load->view('rpjmd/v_rpjmd.php', $data);
 	}
-	//comment 3
+	
 	public function jadwal_load($page = 1, $first = FALSE){
 		$per_page = 12;	
 		$filter = "";
@@ -140,7 +140,7 @@ class Rpjmd extends CI_Controller {
 		$data['subtahap'] = $this->m_rpjmd->getSubTahap()->result_array();
 		$this->load->view('rpjmd/v_rpjmd_jadwal_form', $data);
 	}
-//comment 3
+
 	public function jadwal_save($act){
 		if($act == 'add'){$this->sip->is_curd('I');}
 		elseif($act == 'edit'){$this->sip->is_curd('U');}
@@ -384,6 +384,7 @@ class Rpjmd extends CI_Controller {
 				{
 					throw new Exception('Program gagal ditambahkan.', 2);
 				}
+
 				$this->m_set->updateNextKey('VISI', $newvisikey);
 			}elseif($act == 'edit'){
 				$set = [
@@ -395,6 +396,7 @@ class Rpjmd extends CI_Controller {
 					'IDVISI'	=> $idvisi,
 					'ID_JADWAL'	=> $idjadwal,
 				];
+
 				$affected = $this->m_rpjmd->updateVisi($where, $set);
 
 				if($affected !== 1)
@@ -508,7 +510,7 @@ class Rpjmd extends CI_Controller {
 	{
 		$this->load->library('form_validation');
 		$is_admin 	= $this->sip->is_admin();
-		$idvisi 	= $this->input->post('i-idvisi');
+		$idvisi 	= $this->input->post('f-idvisi');
 		$misikey 	= $this->input->post('i-misikey');
 		if($act == 'add')
 		{
@@ -517,6 +519,7 @@ class Rpjmd extends CI_Controller {
 				$this->json['cod'] = 2;
 				$this->json['msg'] = custom_errors(validation_errors());
 			}
+			var_dump($idvisi);
 			$data = [
 				'act'					=> $act,
 				'misikey'				=>'',
@@ -529,7 +532,7 @@ class Rpjmd extends CI_Controller {
 		}
 		elseif($act == 'edit')
 		{
-			$row = $this->db->query("SELECT	* FROM MISI WHERE MISIKEY = ?",[$idvisi])->row_array();
+			$row = $this->db->query("SELECT	* FROM MISI WHERE MISIKEY = ?",[$misikey])->row_array();
 			$r = settrim($row);
             $data = [
 				'act'					=> $act,
@@ -546,15 +549,20 @@ class Rpjmd extends CI_Controller {
 
 	public function misi_save($act)
 	{
-		if($act == 'add'){
-			$this->sip->is_curd('I');
-		}elseif($act == 'edit'){
-			$this->sip->is_curd('U');
-		}
-
+		if($act == 'add'){$this->sip->is_curd('I');}
+		elseif($act == 'edit'){$this->sip->is_curd('U');}
 		$this->load->library('form_validation');
 		try
 		{
+			$this->form_validation->set_rules('i-nomisi', 'No Misi', 'trim|required');
+			$this->form_validation->set_rules('i-uraimisi', 'Misi', 'trim|required');
+
+			if($this->form_validation->run() == FALSE)
+			{
+				throw new Exception(custom_errors(validation_errors()), 2);
+			}
+
+			$misikey		= $this->input->post('i-misikey');
 			$idvisi			= $this->input->post('i-idvisi');
 			$nomisi			= $this->input->post('i-nomisi');
 			$uraimisi		= $this->input->post('i-uraimisi');
@@ -580,15 +588,17 @@ class Rpjmd extends CI_Controller {
 
 			}elseif($act == 'edit'){
 				$set = [
-					'NOVISI'	=>$novisi,
-					'NMVISI'	=>$nmvisi,
+					'NOMISI'	=> $nomisi,
+					'URAIMISI'	=> $uraimisi,
+					'SASARAN'	=> "-",
 				];
 
 				$where = [
 					'IDVISI'	=> $idvisi,
+					'MISIKEY'	=> $misikey,
 				];
 
-				$affected = $this->m_rpjmd->updateVisi($where, $set);
+				$affected = $this->m_rpjmd->updateMisi($where, $set);
 
 				if($affected !== 1)
 				{
@@ -609,10 +619,34 @@ class Rpjmd extends CI_Controller {
 		}
 	}
 
+	public function misi_delete(){
+		$this->sip->is_curd('D');
+		$this->load->library('form_validation');
+		try
+		{
+			$misikey = $this->input->post('i-check[]');
+			$this->m_rpjmd->deleteMisi($misikey);
+			$affected = $this->db->affected_rows();
+			if($affected < 1)
+			{
+				throw new Exception('Misi gagal dihapus.', 2);
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->db->trans_rollback();
+			$this->json['cod'] = $e->getCode();
+			$this->json['msg'] = $e->getMessage();
+		}
+		if($this->json['cod'] !== NULL)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
+		}
+	}
+
 	public function tujuan_load($page = 1, $first = FALSE){
 		$per_page = 12;	
 		$misikey = $this->input->post('f-misikey');
-		
 		$filter = "AND MISIKEY = '{$misikey}'";
 		$total = $this->m_rpjmd->getTujuan($filter, NULL, TRUE)->row_array()['TOTAL_ROW'];
 		$rows = $this->m_rpjmd->getTujuan($filter, [$per_page, $page])->result_array();
@@ -668,6 +702,138 @@ class Rpjmd extends CI_Controller {
 			$load = ob_get_contents();
 			ob_end_clean();
 			return $load;
+		}
+	}
+
+	public function tujuan_form($act)
+	{
+		$this->load->library('form_validation');
+		$is_admin 	= $this->sip->is_admin();
+		$misikey 	= $this->input->post('f-misikey');
+		$tujukey 	= $this->input->post('i-tujukey');
+		if($act == 'add')
+		{
+			if($this->form_validation->run() == FALSE)
+			{
+				$this->json['cod'] = 2;
+				$this->json['msg'] = custom_errors(validation_errors());
+			}
+			$data = [
+				'act'					=> $act,
+				'misikey'				=> $misikey,
+				'tujukey'				=> '',
+				'notuju'				=> '',
+				'uraituju'				=> '',
+				'curdShow'				=> $this->sip->curdShow('I')
+			];
+		}
+		elseif($act == 'edit')
+		{
+			$row = $this->db->query("SELECT	* FROM TUJUAN WHERE TUJUKEY = ?",[$tujukey])->row_array();
+			$r = settrim($row);
+            $data = [
+				'act'					=> $act,
+				'misikey'				=> $misikey,
+				'tujukey'				=> $tujukey,
+				'notuju'				=> $r['NOTUJU'],
+				'uraituju'				=> $r['URAITUJU'],
+				'curdShow'				=> $this->sip->curdShow('U')
+            ];
+		}
+		$this->load->view('rpjmd/v_rpjmd_tujuan_form', $data);
+	}
+
+	public function tujuan_save($act)
+	{
+		if($act == 'add'){$this->sip->is_curd('I');}
+		elseif($act == 'edit'){$this->sip->is_curd('U');}
+		$this->load->library('form_validation');
+		try
+		{
+			$this->form_validation->set_rules('i-notuju', 'No Tujuan', 'trim|required');
+			$this->form_validation->set_rules('i-uraituju', 'Tujuan', 'trim|required');
+
+			if($this->form_validation->run() == FALSE)
+			{
+				throw new Exception(custom_errors(validation_errors()), 2);
+			}
+
+			$misikey		= $this->input->post('i-misikey');
+			$tujukey		= $this->input->post('i-tujukey');
+			$notuju			= $this->input->post('i-notuju');
+			$uraituju		= $this->input->post('i-uraituju');
+
+			if($act == 'add')
+			{
+				$newtujukey	= $this->m_set->getNextKey('TUJUAN');
+				$set = [
+					'TUJUKEY'	=> $newtujukey,
+					'MISIKEY'	=> $misikey,
+					'NOTUJU'	=> $notuju,
+					'URAITUJU'	=> $uraituju,
+				];
+
+				$affected = $this->m_rpjmd->addTujuan($set);
+				if($affected !== 1)
+				{
+					throw new Exception('Program gagal ditambahkan.', 2);
+				}	
+				$this->m_set->updateNextKey('TUJUAN', $newtujukey);
+
+			}elseif($act == 'edit'){
+				$set = [
+					'NOTUJU'	=> $notuju,
+					'URAITUJU'	=> $uraituju,
+				];
+
+				$where = [
+					'TUJUKEY'	=> $tujukey,
+					'MISIKEY'	=> $misikey,
+				];
+
+				$affected = $this->m_rpjmd->updateTujuan($where, $set);
+
+				if($affected !== 1)
+				{
+					throw new Exception('Data Rekening Belanja Langsung gagal Dirubah.', 2);
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->db->trans_rollback();
+			$this->json['cod'] = $e->getCode();
+			$this->json['msg'] = $e->getMessage();
+		}
+
+		if($this->json['cod'] !== NULL)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
+		}
+	}
+
+	public function tujuan_delete(){
+		$this->sip->is_curd('D');
+		$this->load->library('form_validation');
+		try
+		{
+			$tujukey = $this->input->post('i-check[]');
+			$this->m_rpjmd->deleteTujuan($tujukey);
+			$affected = $this->db->affected_rows();
+			if($affected < 1)
+			{
+				throw new Exception('Tujuan gagal dihapus.', 2);
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->db->trans_rollback();
+			$this->json['cod'] = $e->getCode();
+			$this->json['msg'] = $e->getMessage();
+		}
+		if($this->json['cod'] !== NULL)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
 		}
 	}
 
@@ -737,13 +903,26 @@ class Rpjmd extends CI_Controller {
 	{
 		$this->load->library('form_validation');
 		$is_admin 	= $this->sip->is_admin();
-		$id 		= $this->input->post('i-id');
+		$idjadwal 	= $this->input->post('f-idjadwal');
+		$idvisi 	= $this->input->post('f-idvisi');
+		$misikey 	= $this->input->post('f-misikey');
 		$tujukey 	= $this->input->post('f-tujukey');
+		$idsasaran 	= $this->input->post('i-idsasaran');
+
+		$row = $this->db->query("
+			SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
+			LEFT JOIN VISI V ON V.ID_JADWAL = J.ID
+			LEFT JOIN MISI M ON M.IDVISI = V.IDVISI
+			LEFT JOIN TUJUAN T ON T.MISIKEY = M.MISIKEY
+			WHERE J.ID = '{$idjadwal}'
+			AND V.IDVISI = '{$idvisi}'
+			AND M.MISIKEY = '{$misikey}'
+			AND T.TUJUKEY = '{$tujukey}'"
+		)->row_array();
+		$r = settrim($row);
 
 		if($act == 'add')
 		{
-			$row = $this->db->query("SELECT COUNT(KDTAHUN) AS TOTAL_ROW FROM TAHUN")->row_array();
-			
 			if($this->form_validation->run() == FALSE)
 			{
 				$this->json['cod'] = 2;
@@ -751,26 +930,28 @@ class Rpjmd extends CI_Controller {
 			}
 			$data = [
 				'act'					=> $act,
-				'row'					=> $row["TOTAL_ROW"],
-				'id'					=> '',
+				'idsasaran'				=> '',
 				'tujukey'				=> $tujukey,
 				'nosasaran'				=> '',
 				'sasaran'				=> '',
+				'periode_awal'			=> $r['PERIODE_AWAL'],
+				'periode_akhir'			=> $r['PERIODE_AKHIR'],
 				'indikator'				=> '',
 				'curdShow'				=> $this->sip->curdShow('I')
 			];
 		}
 		elseif($act == 'edit')
 		{
-			$row = $this->db->query("SELECT	* FROM tbl_SASARAN WHERE ID = ?",[$id])->row_array();
+			var_dump($idsasaran);
+			$row = $this->db->query("SELECT	* FROM tbl_SASARAN WHERE ID = ?",[$idsasaran])->row_array();
 			$r = settrim($row);
             $data = [
 				'act'					=> $act,
-				'id'					=>'',
-				'tujukey'				=>$tujukey,
-				'nosasaran'				=>'',
-				'sasaran'				=>'',
-				'indikator'				=>'',
+				'idsasaran'				=> $idsasaran,
+				'tujukey'				=> $tujukey,
+				'nosasaran'				=> '',
+				'sasaran'				=> '',
+				'indikator'				=> '',
 				'curdShow'				=> $this->sip->curdShow('U')
             ];
 		}
@@ -779,12 +960,8 @@ class Rpjmd extends CI_Controller {
 
 	public function sasaran_save($act)
 	{
-		if($act == 'add'){
-			$this->sip->is_curd('I');
-		}elseif($act == 'edit'){
-			$this->sip->is_curd('U');
-		}
-
+		if($act == 'add'){$this->sip->is_curd('I');}
+		elseif($act == 'edit'){$this->sip->is_curd('U');}
 		$this->load->library('form_validation');
 		try
 		{

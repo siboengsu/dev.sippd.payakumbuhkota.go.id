@@ -4,10 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div class="row block-sasaran-form">
 	<div class="col-md-12">
 		<form class="form-horizontal form-sasaran">
-			<input id="i-id" type="hidden" name="i-id" value="<?php echo $id?>">
+			<input id="i-idsasaran" type="hidden" name="i-idsasaran" value="<?php echo $idsasaran?>">
 			<input id="f-tujukey" type="hidden" name="f-tujukey" value="<?php echo $tujukey?>">
 			<input type="hidden" value="1" class="page">
-
 			<div class="form-group">
 				<label class="col-sm-2 control-label">No. Sasaran</label>
 				<div class="col-sm-10">
@@ -30,22 +29,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			</div>
 
 			<div class="form-group">
-				<label class="col-sm-2 control-label">Tahun Ke</label>
+				<label class="col-sm-2 control-label">Tahun</label>
 				<div>
 					<label class="col-sm-5 control-label" style="text-align:center">Target</label>
 					<label class="col-sm-5 control-label" style="text-align:center">Satuan</label>
 				</div>
 			</div>
 
-			<?php for($i=0; $i < $row; $i++) { ?>
+			<?php for($i=$periode_awal; $i <= $periode_akhir; $i++) { ?>
 				<div class="form-group">
-					<label class="col-sm-2 control-label"><?php echo ($i+1);?></label>
-					<input type="hidden" name="i-tahun<?php echo ($i+1);?>" class="form-control" rows="5" value="<?php echo ($i+1);?>"></input>
+					<label class="col-sm-2 control-label"><?php echo ($i);?></label>
+					<input type="hidden" name="i-tahun<?php echo ($i);?>" class="form-control" rows="5" value="<?php echo ($i);?>"></input>
 					<div class="col-sm-5">
-						<input name="i-target<?php echo ($i+1);?>" class="form-control" rows="5" value=""></input>
+						<input name="i-target<?php echo ($i);?>" class="form-control" rows="5" value=""></input>
 					</div>
 					<div class="col-sm-5">
-						<input name="i-satuan<?php echo ($i+1);?>" class="form-control" rows="5" value=""></input>
+						<input name="i-satuan<?php echo ($i);?>" class="form-control" rows="5" value=""></input>
 					</div>
 				</div>
 			<?php } ?>

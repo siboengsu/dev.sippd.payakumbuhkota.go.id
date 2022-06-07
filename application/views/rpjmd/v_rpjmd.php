@@ -178,8 +178,8 @@
 			<div class="text-center block-pagination"></div>
 			<div class="panel-footer">
 				<div class="row">
-					<div class="col-xs-6"><button type="button" class="btn btn-primary btn-misi-form <?php $this->sip->curdShow('I'); ?>" data-act="add"><i class="fa fa-plus"></i> Tambah</button></div>
-					<div class="col-xs-6 text-right"><button type="button" class="btn btn-danger btn-misi-delete <?php $this->sip->curdShow('D'); ?>"><i class="fa fa-times"></i> Hapus</button></div>
+					<div class="col-xs-6"><button type="button" class="btn btn-primary btn-tujuan-form <?php $this->sip->curdShow('I'); ?>" data-act="add"><i class="fa fa-plus"></i> Tambah</button></div>
+					<div class="col-xs-6 text-right"><button type="button" class="btn btn-danger btn-tujuan-delete <?php $this->sip->curdShow('D'); ?>"><i class="fa fa-times"></i> Hapus</button></div>
 				</div>
 			</div>
 		</div>
@@ -380,7 +380,6 @@ $(function() {
         if(act == 'add') {
             title = 'Tambah jadwal';
             type = 'type-success';
-
         } else if(act == 'edit') {
             title = 'Ubah jadwal';
             type = 'type-warning';
@@ -519,6 +518,7 @@ $(function() {
             title = 'Ubah Misi';
             type = 'type-warning';
             data = {
+				'f-idvisi'	: getVal('#f-idvisi'),
                 'i-misikey' : $(this).closest('tr').find("input[name='i-check[]']:checkbox").val()
             };
         }
@@ -532,6 +532,35 @@ $(function() {
         return false;
     });
 
+	$(document).off('click', blockMisi + '.btn-misi-delete');
+	$(document).on('click', blockMisi + '.btn-misi-delete', function(e) {
+		e.preventDefault();
+		if($(blockMisi + ".form-delete input[name='i-check[]']:checkbox:checked").length < 1) {
+			return false;
+		}
+		var id = $(this).closest('tr').data('id');
+		goConfirm({
+			msg : 'Hapus Misi yang dipilih ?',
+			type: 'danger',
+			callback : function(ok) {
+				if(ok) {
+					var data = $.extend({},
+						$(blockMisi + '.form-delete').serializeObject()
+					);
+					$.post('/rpjmd/misi_delete/', data, function(res, status, xhr) {
+						if(contype(xhr) == 'json') {
+							respond(res);
+						} else {
+							dataLoadMisi();
+						}
+					});
+				}
+			}
+		});
+
+		return false;
+	});
+
 	$(document).off('click', blockMisi + '.btn-show-tujuan');
 	$(document).on('click', blockMisi + '.btn-show-tujuan', function(e) {
 		e.preventDefault();
@@ -541,6 +570,62 @@ $(function() {
 		$('#f-misikey').val(id);
 		$(blockTujuan).fadeIn('fast');
 		dataLoadTujuan();
+	});
+
+	$(document).off('click', blockTujuan + '.btn-tujuan-form');
+    $(document).on('click', blockTujuan + '.btn-tujuan-form', function(e) {
+        e.preventDefault();
+        var act = $(this).data('act'),
+            data, title, type;
+        if(act == 'add') {
+            title = 'Tambah Tujuan';
+            type = 'type-success';
+			data = {'f-misikey'	: getVal('#f-misikey')};
+        } else if(act == 'edit') {
+            title = 'Ubah Tujuan';
+            type = 'type-warning';
+            data = {
+				'f-misikey'	: getVal('#f-misikey'),
+                'i-tujukey' : $(this).closest('tr').find("input[name='i-check[]']:checkbox").val()
+            };
+        }
+        modalTujuanForm = new BootstrapDialog({
+            title: title,
+            type: type,
+            size: 'size-wide',
+            message: $('<div></div>').load('/rpjmd/tujuan_form/' + act, data)
+        });
+        modalTujuanForm.open();
+        return false;
+    });
+
+	$(document).off('click', blockTujuan + '.btn-tujuan-delete');
+	$(document).on('click', blockTujuan + '.btn-tujuan-delete', function(e) {
+		e.preventDefault();
+		if($(blockTujuan + ".form-delete input[name='i-check[]']:checkbox:checked").length < 1) {
+			return false;
+		}
+		var id = $(this).closest('tr').data('id');
+		goConfirm({
+			msg : 'Hapus Tujuan yang dipilih ?',
+			type: 'danger',
+			callback : function(ok) {
+				if(ok) {
+					var data = $.extend({},
+						$(blockTujuan + '.form-delete').serializeObject()
+					);
+					$.post('/rpjmd/tujuan_delete/', data, function(res, status, xhr) {
+						if(contype(xhr) == 'json') {
+							respond(res);
+						} else {
+							dataLoadTujuan();
+						}
+					});
+				}
+			}
+		});
+
+		return false;
 	});
 
 	$(document).off('click', blockTujuan + '.btn-show-sasaran');
@@ -559,16 +644,23 @@ $(function() {
         e.preventDefault();
         var act = $(this).data('act'),
             data, title, type;
+			data = {
+				'f-idjadwal'	: getVal('#f-idjadwal'),
+				'f-idvisi'		: getVal('#f-idvisi'),
+				'f-misikey'		: getVal('#f-misikey'),
+				'f-tujukey'		: getVal('#f-tujukey')
+			};
         if(act == 'add') {
             title = 'Tambah Sasaran';
             type = 'type-success';
-			data = {'f-tujukey'	: getVal('#f-tujukey')};
+			data = $.extend({},data);
         } else if(act == 'edit') {
             title = 'Ubah Sasaran';
             type = 'type-warning';
-            data = {
-                'i-id' : $(this).closest('tr').find("input[name='i-check[]']:checkbox").val()
-            };
+            data = $.extend({},
+				   data,
+				   {'i-idsasaran' : $(this).closest('tr').find("input[name='i-check[]']:checkbox").val()}
+			);
         }
         modalSasaranForm = new BootstrapDialog({
             title: title,

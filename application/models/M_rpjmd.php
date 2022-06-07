@@ -98,6 +98,10 @@ class M_rpjmd extends CI_Model {
 		return $this->db->affected_rows();
 	}
 
+	public function deleteMisi($misikey){
+		$this->db->query("DELETE FROM MISI WHERE MISIKEY IN ?",[$misikey]);
+	}
+
 	public function getTujuan($filter = NULL, $offset = NULL, $count = FALSE){
 		if($count){
 			return $this->db->query("SELECT COUNT(TUJUKEY) AS TOTAL_ROW FROM TUJUAN WHERE 1=1 {$filter} ");
@@ -108,6 +112,21 @@ class M_rpjmd extends CI_Model {
 			$where = "WHERE X.ROWNUM BETWEEN (($page - 1) * $limit) + 1 AND $limit * ($page)";
 		}
 		return $this->db->query("SELECT * FROM ( SELECT ROW_NUMBER() OVER(ORDER BY TUJUKEY ASC) AS ROWNUM, TUJUKEY, NOTUJU, URAITUJU FROM TUJUAN WHERE 1=1 {$filter}) X");}
+	}
+
+	public function addTujuan($set = []){
+		$this->db->insert('TUJUAN', $set);
+		return $this->db->affected_rows();
+	}
+
+	public function updateTujuan($where, $set = []){
+	  	$this->db->where($where);
+		$this->db->update('TUJUAN', $set);
+		return $this->db->affected_rows();
+	}
+
+	public function deleteTujuan($tujukey){
+		$this->db->query("DELETE FROM TUJUAN WHERE TUJUKEY IN ?",[$tujukey]);
 	}
 
 	public function getSasaran($filter = NULL, $offset = NULL, $count = FALSE){

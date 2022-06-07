@@ -16,7 +16,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Misi</label>
 				<div class="col-sm-10">
-					<input name="i-uraimisi" class="form-control" rows="5" value="<?php echo $nomisi; ?>"></input>
+					<input name="i-uraimisi" class="form-control" rows="5" value="<?php echo $uraimisi; ?>"></input>
 				</div>
 			</div>
 			<div class="form-group">
