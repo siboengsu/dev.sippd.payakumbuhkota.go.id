@@ -28,7 +28,7 @@ class Rpjmd extends CI_Controller {
         $data['visi'] = $this->m_rpjmd->getVisi();
 		$this->load->view('rpjmd/v_rpjmd.php', $data);
 	}
-
+	//comment 3
 	public function jadwal_load($page = 1, $first = FALSE){
 		$per_page = 12;	
 		$filter = "";
@@ -140,7 +140,7 @@ class Rpjmd extends CI_Controller {
 		$data['subtahap'] = $this->m_rpjmd->getSubTahap()->result_array();
 		$this->load->view('rpjmd/v_rpjmd_jadwal_form', $data);
 	}
-
+//comment 3
 	public function jadwal_save($act){
 		if($act == 'add'){$this->sip->is_curd('I');}
 		elseif($act == 'edit'){$this->sip->is_curd('U');}
