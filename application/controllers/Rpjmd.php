@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Rpjmd extends CI_Controller {
-
+	// comment
 	private $json = ['cod' => NULL, 'msg' => NULL, 'link' => NULL];
 
 	private $KDTAHUN = NULL;
