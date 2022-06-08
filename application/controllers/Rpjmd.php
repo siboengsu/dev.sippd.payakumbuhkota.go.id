@@ -921,6 +921,14 @@ class Rpjmd extends CI_Controller {
 		)->row_array();
 		$r = settrim($row);
 
+		for($i=$r['PERIODE_AWAL']; $i<=$r['PERIODE_AKHIR']; $i++){
+			$rowsasaran[] = $this->db->query("
+				SELECT * FROM tbl_SASARAN S 
+				LEFT JOIN tbl_SUBSASARAN SS ON SS.ID_SASARAN = S.ID
+				WHERE S.ID = ? AND SS.TAHUN = ?",[$idsasaran,$i])->row_array();
+			$rs = settrim($rowsasaran);
+		}
+
 		if($act == 'add')
 		{
 			if($this->form_validation->run() == FALSE)
@@ -931,27 +939,30 @@ class Rpjmd extends CI_Controller {
 			$data = [
 				'act'					=> $act,
 				'idsasaran'				=> '',
+				'idjadwal'				=> $idjadwal,
+				'idvisi'				=> $idvisi,
+				'misikey'				=> $misikey,
 				'tujukey'				=> $tujukey,
 				'nosasaran'				=> '',
 				'sasaran'				=> '',
-				'periode_awal'			=> $r['PERIODE_AWAL'],
-				'periode_akhir'			=> $r['PERIODE_AKHIR'],
 				'indikator'				=> '',
+				'length'				=> $r['TOTAL_ROW'],
+				'target'				=> $rs,
 				'curdShow'				=> $this->sip->curdShow('I')
 			];
 		}
 		elseif($act == 'edit')
 		{
-			var_dump($idsasaran);
-			$row = $this->db->query("SELECT	* FROM tbl_SASARAN WHERE ID = ?",[$idsasaran])->row_array();
-			$r = settrim($row);
+			var_dump($rs);
             $data = [
 				'act'					=> $act,
 				'idsasaran'				=> $idsasaran,
 				'tujukey'				=> $tujukey,
-				'nosasaran'				=> '',
-				'sasaran'				=> '',
-				'indikator'				=> '',
+				'nosasaran'				=> $rs[1]['NOSASARAN'],
+				'sasaran'				=> $rs[1]['SASARAN'],
+				'indikator'				=> $rs[1]['INDIKATOR'],
+				'length'				=> $r['TOTAL_ROW'],
+				'target'				=> $rs,
 				'curdShow'				=> $this->sip->curdShow('U')
             ];
 		}
@@ -965,29 +976,45 @@ class Rpjmd extends CI_Controller {
 		$this->load->library('form_validation');
 		try
 		{
-			$id			= $this->input->post('i-id');
+			$idjadwal 	= $this->input->post('i-idjadwal');
+			$idvisi 	= $this->input->post('i-idvisi');
+			$misikey 	= $this->input->post('i-misikey');
+			$tujukey	= $this->input->post('f-tujukey');
+			$idsasaran	= $this->input->post('i-idsasaran');
 			$nosasaran	= $this->input->post('i-nosasaran');
 			$sasaran	= $this->input->post('i-sasaran');
 			$indikator	= $this->input->post('i-indikator');
-			$tujukey	= $this->input->post('f-tujukey');
 
+			$row = $this->db->query("
+				SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
+				LEFT JOIN VISI V ON V.ID_JADWAL = J.ID
+				LEFT JOIN MISI M ON M.IDVISI = V.IDVISI
+				LEFT JOIN TUJUAN T ON T.MISIKEY = M.MISIKEY
+				WHERE J.ID = '{$idjadwal}'
+				AND V.IDVISI = '{$idvisi}'
+				AND M.MISIKEY = '{$misikey}'
+				AND T.TUJUKEY = '{$tujukey}'"
+			)->row_array();
+			$r = settrim($row); 
+			
+			$tahun = $r['PERIODE_AWAL'];
 			if($act == 'add')
 			{
+				$newsasarankey	= $this->m_set->getNextKey('SASARAN');
 				$set = [
-					'ID'		=> "7",
+					'ID'=> $newsasarankey,
 					'TUJUKEY'	=> $tujukey,
 					'NOSASARAN'	=> $nosasaran,
 					'SASARAN'	=> $sasaran,
 					'INDIKATOR'	=> $indikator
 				];  
 
-				for($i=0; $i<6; $i++){
-					$tahun+$i = $this->input->post('i-tahun'.$i);
+				for($i=0; $i<=$r['TOTAL_ROW']; $i++){
 						$subset = [
-						'ID'		=> "7",
-						'TAHUN'		=> $tahun+$i,
-						'TARGET'	=> "2",
-						'SATUAN'	=> "2"
+						'ID_SASARAN'=> $newsasarankey,
+						'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),
+						'TARGET'	=> $this->input->post("i-target{$i}"),
+						'SATUAN'	=> $this->input->post("i-satuan{$i}"),
 						];
 					$affected = $this->m_rpjmd->addSubSasaran($subset);
 				}
@@ -996,7 +1023,8 @@ class Rpjmd extends CI_Controller {
 				if($affected !== 1)
 				{
 					throw new Exception('Program gagal ditambahkan.', 2);
-				}	
+				}
+				$this->m_set->updateNextKey('SASARAN', $newsasarankey);
 			}elseif($act == 'edit'){
 				$set = [
 					'NOVISI'	=>$novisi,
