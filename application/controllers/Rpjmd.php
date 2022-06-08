@@ -953,7 +953,6 @@ class Rpjmd extends CI_Controller {
 		}
 		elseif($act == 'edit')
 		{
-			var_dump($rs);
             $data = [
 				'act'					=> $act,
 				'idsasaran'				=> $idsasaran,
@@ -1002,7 +1001,7 @@ class Rpjmd extends CI_Controller {
 			{
 				$newsasarankey	= $this->m_set->getNextKey('SASARAN');
 				$set = [
-					'ID'=> $newsasarankey,
+					'ID'		=> $newsasarankey,
 					'TUJUKEY'	=> $tujukey,
 					'NOSASARAN'	=> $nosasaran,
 					'SASARAN'	=> $sasaran,
@@ -1027,15 +1026,30 @@ class Rpjmd extends CI_Controller {
 				$this->m_set->updateNextKey('SASARAN', $newsasarankey);
 			}elseif($act == 'edit'){
 				$set = [
-					'NOVISI'	=>$novisi,
-					'NMVISI'	=>$nmvisi,
+					'NOSASARAN'	=> $nosasaran,
+					'SASARAN'	=> $sasaran,
+					'INDIKATOR'	=> $indikator
 				];
 
 				$where = [
-					'IDVISI'	=> $idvisi,
+					'ID'		=> $idsasaran,
+					'TUJUKEY'	=> $tujukey,
 				];
 
-				$affected = $this->m_rpjmd->updateVisi($where, $set);
+				$affected = $this->m_rpjmd->updateSasaran($where, $set);
+
+				for($i=0; $i<=$r['TOTAL_ROW']; $i++){
+						$subset = [
+							'TARGET'	=> $tahun,
+							'SATUAN'	=> 4,
+						];
+
+						$where = [
+							'ID_SASARAN'=> $idsasaran,
+							'TAHUN'		=> 2024,	
+						];
+					$this->m_rpjmd->updateSubsasaran($where, $subset);
+				}
 
 				if($affected !== 1)
 				{

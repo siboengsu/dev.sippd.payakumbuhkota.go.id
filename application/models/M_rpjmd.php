@@ -146,8 +146,20 @@ class M_rpjmd extends CI_Model {
 		return $this->db->affected_rows();
 	}
 
+	public function updateSasaran($where, $set = []){
+		$this->db->where($where);
+		$this->db->update('tbl_SASARAN', $set);
+		return $this->db->affected_rows();
+	}
+
 	public function addSubSasaran($subset = []){
 		$this->db->insert('tbl_SUBSASARAN', $subset);
+		return $this->db->affected_rows();
+	}
+
+	public function updateSubsasaran($where, $subset = []){
+		$this->db->where($where);
+		$this->db->update('tbl_SUBSASARAN', $subset);
 		return $this->db->affected_rows();
 	}
 
