@@ -163,6 +163,11 @@ class M_rpjmd extends CI_Model {
 		return $this->db->affected_rows();
 	}
 
+	public function deleteSasaran($idsasaran){
+		$this->db->query("DELETE FROM tbl_SASARAN WHERE ID IN ?",[$idsasaran]);
+		$this->db->query("DELETE FROM tbl_SUBSASARAN WHERE ID_SASARAN IN ?",[$idsasaran]);
+	}
+
 	public function getProgram($filter = NULL, $offset = NULL, $count = FALSE){
 		if($count){ 
 			return $this->db->query("SELECT COUNT(ID) AS TOTAL_ROW FROM tbl_PROGRAM WHERE 1=1 {$filter} ");

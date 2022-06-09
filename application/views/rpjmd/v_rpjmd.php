@@ -672,6 +672,35 @@ $(function() {
         return false;
     });
 
+	$(document).off('click', blockSasaran + '.btn-sasaran-delete');
+	$(document).on('click', blockSasaran + '.btn-sasaran-delete', function(e) {
+		e.preventDefault();
+		if($(blockSasaran + ".form-delete input[name='i-check[]']:checkbox:checked").length < 1) {
+			return false;
+		}
+		var id = $(this).closest('tr').data('id');
+		goConfirm({
+			msg : 'Hapus Sasaran yang dipilih ?',
+			type: 'danger',
+			callback : function(ok) {
+				if(ok) {
+					var data = $.extend({},
+						$(blockSasaran + '.form-delete').serializeObject()
+					);
+					$.post('/rpjmd/sasaran_delete/', data, function(res, status, xhr) {
+						if(contype(xhr) == 'json') {
+							respond(res);
+						} else {
+							dataLoadSasaran();
+						}
+					});
+				}
+			}
+		});
+
+		return false;
+	});
+
 	$(document).off('click', blockSasaran + '.btn-show-program');
 	$(document).on('click', blockSasaran + '.btn-show-program', function(e) {
 		e.preventDefault();

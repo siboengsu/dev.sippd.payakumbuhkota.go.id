@@ -73,12 +73,12 @@ class Rpjmd extends CI_Controller {
 		<tr class="hidden"><td class="pagetemp"><?php echo $this->pagination->create_links(); ?></td></tr>
 		<script>
 		$(function() {
-			$(blockVisi + '.block-pagination').html($(blockVisi + '.pagetemp').html());
+			$(blockJadwal + '.block-pagination').html($(blockJadwal + '.pagetemp').html());
 		});
 		$(function() {
-			$(document).off('click', blockVisi + '.check-all');
-			$(document).on('click', blockVisi + '.check-all', function(e) {
-				var checkboxes = $(blockVisi + "input[name='i-check[]']:checkbox");
+			$(document).off('click', blockJadwal + '.check-all');
+			$(document).on('click', blockJadwal + '.check-all', function(e) {
+				var checkboxes = $(blockJadwal + "input[name='i-check[]']:checkbox");
 				checkboxes.prop('checked', $(this).is(':checked')).not($(this)).change();
 			});
 		});
@@ -880,12 +880,12 @@ class Rpjmd extends CI_Controller {
 		<tr class="hidden"><td class="pagetemp"><?php echo $this->pagination->create_links(); ?></td></tr>
 		<script>
 		$(function() {
-			$(blockTujuan + '.block-pagination').html($(blockTujuan + '.pagetemp').html());
+			$(blockSasaran + '.block-pagination').html($(blockSasaran + '.pagetemp').html());
 		});
 		$(function() {
-			$(document).off('click', blockTujuan + '.check-all');
-			$(document).on('click', blockTujuan + '.check-all', function(e) {
-				var checkboxes = $(blockTujuan + "input[name='i-check[]']:checkbox");
+			$(document).off('click', blockSasaran + '.check-all');
+			$(document).on('click', blockSasaran + '.check-all', function(e) {
+				var checkboxes = $(blockSasaran + "input[name='i-check[]']:checkbox");
 				checkboxes.prop('checked', $(this).is(':checked')).not($(this)).change();
 			});
 		});
@@ -936,6 +936,7 @@ class Rpjmd extends CI_Controller {
 				$this->json['cod'] = 2;
 				$this->json['msg'] = custom_errors(validation_errors());
 			}
+			var_dump($r);
 			$data = [
 				'act'					=> $act,
 				'idsasaran'				=> '',
@@ -948,6 +949,7 @@ class Rpjmd extends CI_Controller {
 				'indikator'				=> '',
 				'length'				=> $r['TOTAL_ROW'],
 				'target'				=> $rs,
+				'tahun'					=> $r['PERIODE_AWAL'],
 				'curdShow'				=> $this->sip->curdShow('I')
 			];
 		}
@@ -956,12 +958,16 @@ class Rpjmd extends CI_Controller {
             $data = [
 				'act'					=> $act,
 				'idsasaran'				=> $idsasaran,
+				'idjadwal'				=> $idjadwal,
+				'idvisi'				=> $idvisi,
+				'misikey'				=> $misikey,
 				'tujukey'				=> $tujukey,
 				'nosasaran'				=> $rs[1]['NOSASARAN'],
 				'sasaran'				=> $rs[1]['SASARAN'],
 				'indikator'				=> $rs[1]['INDIKATOR'],
 				'length'				=> $r['TOTAL_ROW'],
 				'target'				=> $rs,
+				'tahun'					=> $r['PERIODE_AWAL'],
 				'curdShow'				=> $this->sip->curdShow('U')
             ];
 		}
@@ -1040,13 +1046,13 @@ class Rpjmd extends CI_Controller {
 
 				for($i=0; $i<=$r['TOTAL_ROW']; $i++){
 						$subset = [
-							'TARGET'	=> $tahun,
-							'SATUAN'	=> 4,
+							'TARGET'	=> $this->input->post("i-target{$i}"),
+							'SATUAN'	=> $this->input->post("i-satuan{$i}"),
 						];
 
 						$where = [
 							'ID_SASARAN'=> $idsasaran,
-							'TAHUN'		=> 2024,	
+							'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),	
 						];
 					$this->m_rpjmd->updateSubsasaran($where, $subset);
 				}
@@ -1064,6 +1070,31 @@ class Rpjmd extends CI_Controller {
 			$this->json['msg'] = $e->getMessage();
 		}
 
+		if($this->json['cod'] !== NULL)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
+		}
+	}
+
+	public function sasaran_delete(){
+		$this->sip->is_curd('D');
+		$this->load->library('form_validation');
+		try
+		{
+			$idsasaran = $this->input->post('i-check[]');
+			$this->m_rpjmd->deleteSasaran($idsasaran);
+			$affected = $this->db->affected_rows();
+			if($affected < 1)
+			{
+				throw new Exception('Tujuan gagal dihapus.', 2);
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->db->trans_rollback();
+			$this->json['cod'] = $e->getCode();
+			$this->json['msg'] = $e->getMessage();
+		}
 		if($this->json['cod'] !== NULL)
 		{
 			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));

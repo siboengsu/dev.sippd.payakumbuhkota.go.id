@@ -4,11 +4,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div class="row block-sasaran-form">
 	<div class="col-md-12">
 		<form class="form-horizontal form-sasaran">
-			<?php if($act == 'add') { ?>
+			
 				<input id="i-idjadwal" type="hidden" name="i-idjadwal" value="<?php echo $idjadwal?>">
 				<input id="i-idvisi" type="hidden" name="i-idvisi" value="<?php echo $idvisi?>">
 				<input id="i-misikey" type="hidden" name="i-misikey" value="<?php echo $misikey?>">
-			<?php } ?>
+			
 			<input id="i-idsasaran" type="hidden" name="i-idsasaran" value="<?php echo $idsasaran?>">
 			<input id="f-tujukey" type="hidden" name="f-tujukey" value="<?php echo $tujukey?>">
 			<input type="hidden" value="1" class="page">
@@ -43,7 +43,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 			<?php for($i=0; $i <= $length; $i++)  { ?>
 				<div class="form-group">
-					<label class="col-sm-2 control-label"><?php echo $target[$i]['TAHUN'];?></label>
+					<label class="col-sm-2 control-label"><?php echo (($tahun)+$i);?></label>
 					<input type="hidden" name="i-tahun<?php echo $i;?>" class="form-control" rows="5" value="<?php echo $target[$i]['TAHUN'];?>"></input>
 					<div class="col-sm-5">
 						<input name="i-target<?php echo $i;?>" class="form-control" rows="5" value="<?php echo $target[$i]['TARGET'];?>"></input>
