@@ -4,11 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div class="row block-sasaran-form">
 	<div class="col-md-12">
 		<form class="form-horizontal form-sasaran">
-			
-				<input id="i-idjadwal" type="hidden" name="i-idjadwal" value="<?php echo $idjadwal?>">
-				<input id="i-idvisi" type="hidden" name="i-idvisi" value="<?php echo $idvisi?>">
-				<input id="i-misikey" type="hidden" name="i-misikey" value="<?php echo $misikey?>">
-			
+			<input id="i-idjadwal" type="hidden" name="i-idjadwal" value="<?php echo $idjadwal?>">
+			<input id="i-idvisi" type="hidden" name="i-idvisi" value="<?php echo $idvisi?>">
+			<input id="i-misikey" type="hidden" name="i-misikey" value="<?php echo $misikey?>">
 			<input id="i-idsasaran" type="hidden" name="i-idsasaran" value="<?php echo $idsasaran?>">
 			<input id="f-tujukey" type="hidden" name="f-tujukey" value="<?php echo $tujukey?>">
 			<input type="hidden" value="1" class="page">

@@ -272,8 +272,8 @@
 			<div class="text-center block-pagination"></div>
 			<div class="panel-footer">
 				<div class="row">
-					<div class="col-xs-6"><button type="button" class="btn btn-primary btn-sasaran-form <?php $this->sip->curdShow('I'); ?>" data-act="add"><i class="fa fa-plus"></i> Tambah</button></div>
-					<div class="col-xs-6 text-right"><button type="button" class="btn btn-danger btn-sasaran-delete <?php $this->sip->curdShow('D'); ?>"><i class="fa fa-times"></i> Hapus</button></div>
+					<div class="col-xs-6"><button type="button" class="btn btn-primary btn-program-form <?php $this->sip->curdShow('I'); ?>" data-act="add"><i class="fa fa-plus"></i> Tambah</button></div>
+					<div class="col-xs-6 text-right"><button type="button" class="btn btn-danger btn-program-delete <?php $this->sip->curdShow('D'); ?>"><i class="fa fa-times"></i> Hapus</button></div>
 				</div>
 			</div>
 		</div>
@@ -711,5 +711,35 @@ $(function() {
 		$(blockProgram).fadeIn('fast');
 		dataLoadProgram();
 	});
+
+	$(document).off('click', blockProgram + '.btn-program-form');
+    $(document).on('click', blockProgram + '.btn-program-form', function(e) {
+        e.preventDefault();
+        var act = $(this).data('act'),
+            data, title, type;
+			data = {
+				
+			};
+        if(act == 'add') {
+            title = 'Tambah Program';
+            type = 'type-success';
+			data = $.extend({},data);
+        } else if(act == 'edit') {
+            title = 'Ubah Program';
+            type = 'type-warning';
+            data = $.extend({},
+				   data,
+				   {'i-idprogram' : $(this).closest('tr').find("input[name='i-check[]']:checkbox").val()}
+			);
+        }
+        modalProgramForm = new BootstrapDialog({
+            title: title,
+            type: type,
+            size: 'size-wide',
+            message: $('<div></div>').load('/rpjmd/program_form/' + act, data)
+        });
+        modalProgramForm.open();
+        return false;
+    });
 });
 </script>

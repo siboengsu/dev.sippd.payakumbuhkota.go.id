@@ -1104,7 +1104,7 @@ class Rpjmd extends CI_Controller {
 	public function program_load($page = 1, $first = FALSE){
 		$per_page = 12;	
 		$idsasaran = $this->input->post('f-idsasaran');
-		$filter = "AND idsasaran = '{$idsasaran}'";
+		$filter = "AND ID_SASARAN = '{$idsasaran}'";
 		$total = $this->m_rpjmd->getProgram($filter, NULL, TRUE)->row_array()['TOTAL_ROW'];
 		$rows = $this->m_rpjmd->getProgram($filter, [$per_page, $page])->result_array();
 		while ($page > 1 AND count($rows) < 1):
@@ -1161,6 +1161,73 @@ class Rpjmd extends CI_Controller {
 			ob_end_clean();
 			return $load;
 		}
+	}
+
+	public function program_form($act)
+	{
+		// $this->load->library('form_validation');
+		// $is_admin 	= $this->sip->is_admin();
+		// $idjadwal 	= $this->input->post('f-idjadwal');
+		// $idvisi 	= $this->input->post('f-idvisi');
+		// $misikey 	= $this->input->post('f-misikey');
+		// $tujukey 	= $this->input->post('f-tujukey');
+		// $idsasaran 	= $this->input->post('i-idsasaran');
+
+		// $row = $this->db->query("
+		// 	SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
+		// 	LEFT JOIN VISI V ON V.ID_JADWAL = J.ID
+		// 	LEFT JOIN MISI M ON M.IDVISI = V.IDVISI
+		// 	LEFT JOIN TUJUAN T ON T.MISIKEY = M.MISIKEY
+		// 	WHERE J.ID = '{$idjadwal}'
+		// 	AND V.IDVISI = '{$idvisi}'
+		// 	AND M.MISIKEY = '{$misikey}'
+		// 	AND T.TUJUKEY = '{$tujukey}'"
+		// )->row_array();
+		// $r = settrim($row);
+
+		// for($i=$r['PERIODE_AWAL']; $i<=$r['PERIODE_AKHIR']; $i++){
+		// 	$rowsasaran[] = $this->db->query("
+		// 		SELECT * FROM tbl_SASARAN S 
+		// 		LEFT JOIN tbl_SUBSASARAN SS ON SS.ID_SASARAN = S.ID
+		// 		WHERE S.ID = ? AND SS.TAHUN = ?",[$idsasaran,$i])->row_array();
+		// 	$rs = settrim($rowsasaran);
+		// }
+
+		if($act == 'add')
+		{
+			$unitkey = $this->sip->unitkey($this->input->post('f-unitkey'));
+			// if($this->form_validation->run() == FALSE)
+			// {
+			// 	$this->json['cod'] = 2;
+			// 	$this->json['msg'] = custom_errors(validation_errors());
+			// }
+			// var_dump($r);
+			$data = [
+				'act'					=> $act,
+				'kdprgrm'				=> '',
+				'nmprgrm'				=> '',
+				'curdShow'				=> $this->sip->curdShow('I')
+			];
+		}
+		elseif($act == 'edit')
+		{
+            $data = [
+				'act'					=> $act,
+				'idsasaran'				=> $idsasaran,
+				'idjadwal'				=> $idjadwal,
+				'idvisi'				=> $idvisi,
+				'misikey'				=> $misikey,
+				'tujukey'				=> $tujukey,
+				'nosasaran'				=> $rs[1]['NOSASARAN'],
+				'sasaran'				=> $rs[1]['SASARAN'],
+				'indikator'				=> $rs[1]['INDIKATOR'],
+				'length'				=> $r['TOTAL_ROW'],
+				'target'				=> $rs,
+				'tahun'					=> $r['PERIODE_AWAL'],
+				'curdShow'				=> $this->sip->curdShow('U')
+            ];
+		}
+		$this->load->view('rpjmd/v_rpjmd_program_form', $data);
 	}
 }
 ?>
