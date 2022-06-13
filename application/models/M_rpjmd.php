@@ -183,4 +183,9 @@ class M_rpjmd extends CI_Model {
 			LEFT JOIN MPGRMRKPD MP ON P.PGRMRKPDKEY = MP.PGRMRKPDKEY
 			WHERE KDTAHUN = 22 {$filter}) X");}
 	}
+
+	public function addProgram($set = []){
+		$this->db->insert('tbl_PROGRAM', $set);
+		return $this->db->affected_rows();
+	}
 }

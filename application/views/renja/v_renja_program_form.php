@@ -146,7 +146,6 @@ $(function() {
 			'setkd'	: '#v-kdprgrm',
 			'setnm'	: '#v-nmprgrm'
 		}
-
 		modalLookupProgram = new BootstrapDialog({
 			title: 'Lookup Program',
 			type: 'type-info',

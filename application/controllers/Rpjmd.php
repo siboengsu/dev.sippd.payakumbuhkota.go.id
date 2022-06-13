@@ -938,37 +938,37 @@ class Rpjmd extends CI_Controller {
 			}
 			var_dump($r);
 			$data = [
-				'act'					=> $act,
-				'idsasaran'				=> '',
-				'idjadwal'				=> $idjadwal,
-				'idvisi'				=> $idvisi,
-				'misikey'				=> $misikey,
-				'tujukey'				=> $tujukey,
-				'nosasaran'				=> '',
-				'sasaran'				=> '',
-				'indikator'				=> '',
-				'length'				=> $r['TOTAL_ROW'],
-				'target'				=> $rs,
-				'tahun'					=> $r['PERIODE_AWAL'],
-				'curdShow'				=> $this->sip->curdShow('I')
+				'act'		=> $act,
+				'idsasaran'	=> '',
+				'idjadwal'	=> $idjadwal,
+				'idvisi'	=> $idvisi,
+				'misikey'	=> $misikey,
+				'tujukey'	=> $tujukey,
+				'nosasaran'	=> '',
+				'sasaran'	=> '',
+				'indikator'	=> '',
+				'length'	=> $r['TOTAL_ROW'],
+				'target'	=> $rs,
+				'tahun'		=> $r['PERIODE_AWAL'],
+				'curdShow'	=> $this->sip->curdShow('I')
 			];
 		}
 		elseif($act == 'edit')
 		{
             $data = [
-				'act'					=> $act,
-				'idsasaran'				=> $idsasaran,
-				'idjadwal'				=> $idjadwal,
-				'idvisi'				=> $idvisi,
-				'misikey'				=> $misikey,
-				'tujukey'				=> $tujukey,
-				'nosasaran'				=> $rs[1]['NOSASARAN'],
-				'sasaran'				=> $rs[1]['SASARAN'],
-				'indikator'				=> $rs[1]['INDIKATOR'],
-				'length'				=> $r['TOTAL_ROW'],
-				'target'				=> $rs,
-				'tahun'					=> $r['PERIODE_AWAL'],
-				'curdShow'				=> $this->sip->curdShow('U')
+				'act'		=> $act,
+				'idsasaran'	=> $idsasaran,
+				'idjadwal'	=> $idjadwal,
+				'idvisi'	=> $idvisi,
+				'misikey'	=> $misikey,
+				'tujukey'	=> $tujukey,
+				'nosasaran'	=> $rs[1]['NOSASARAN'],
+				'sasaran'	=> $rs[1]['SASARAN'],
+				'indikator'	=> $rs[1]['INDIKATOR'],
+				'length'	=> $r['TOTAL_ROW'],
+				'target'	=> $rs,
+				'tahun'		=> $r['PERIODE_AWAL'],
+				'curdShow'	=> $this->sip->curdShow('U')
             ];
 		}
 		$this->load->view('rpjmd/v_rpjmd_sasaran_form', $data);
@@ -1165,25 +1165,29 @@ class Rpjmd extends CI_Controller {
 
 	public function program_form($act)
 	{
-		// $this->load->library('form_validation');
-		// $is_admin 	= $this->sip->is_admin();
-		// $idjadwal 	= $this->input->post('f-idjadwal');
-		// $idvisi 	= $this->input->post('f-idvisi');
-		// $misikey 	= $this->input->post('f-misikey');
-		// $tujukey 	= $this->input->post('f-tujukey');
-		// $idsasaran 	= $this->input->post('i-idsasaran');
+		$this->load->library('form_validation');
+		$is_admin 	= $this->sip->is_admin();
+		$idjadwal 	= $this->input->post('f-idjadwal');
+		$idvisi 	= $this->input->post('f-idvisi');
+		$misikey 	= $this->input->post('f-misikey');
+		$tujukey 	= $this->input->post('f-tujukey');
+		$idsasaran 	= $this->input->post('f-idsasaran');
+		$unitkey 	= $this->sip->unitkey($this->input->post('f-unitkey'));
+		$pgrmrkpdkey = $this->input->post('f-pgrmrkpdkey');
 
-		// $row = $this->db->query("
-		// 	SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
-		// 	LEFT JOIN VISI V ON V.ID_JADWAL = J.ID
-		// 	LEFT JOIN MISI M ON M.IDVISI = V.IDVISI
-		// 	LEFT JOIN TUJUAN T ON T.MISIKEY = M.MISIKEY
-		// 	WHERE J.ID = '{$idjadwal}'
-		// 	AND V.IDVISI = '{$idvisi}'
-		// 	AND M.MISIKEY = '{$misikey}'
-		// 	AND T.TUJUKEY = '{$tujukey}'"
-		// )->row_array();
-		// $r = settrim($row);
+		$row = $this->db->query("
+			SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
+			LEFT JOIN VISI V ON V.ID_JADWAL = J.ID
+			LEFT JOIN MISI M ON M.IDVISI = V.IDVISI
+			LEFT JOIN TUJUAN T ON T.MISIKEY = M.MISIKEY
+			LEFT JOIN tbl_SASARAN S ON S.TUJUKEY = T.TUJUKEY
+			WHERE J.ID = '{$idjadwal}'
+			AND V.IDVISI = '{$idvisi}'
+			AND M.MISIKEY = '{$misikey}'
+			AND T.TUJUKEY = '{$tujukey}'
+			AND S.ID = '{$idsasaran}'"
+		)->row_array();
+		$r = settrim($row);
 
 		// for($i=$r['PERIODE_AWAL']; $i<=$r['PERIODE_AKHIR']; $i++){
 		// 	$rowsasaran[] = $this->db->query("
@@ -1195,18 +1199,28 @@ class Rpjmd extends CI_Controller {
 
 		if($act == 'add')
 		{
-			$unitkey = $this->sip->unitkey($this->input->post('f-unitkey'));
-			// if($this->form_validation->run() == FALSE)
-			// {
-			// 	$this->json['cod'] = 2;
-			// 	$this->json['msg'] = custom_errors(validation_errors());
-			// }
-			// var_dump($r);
+			$unitkey = $this->sip->unitkey($this->input->post('l-unitkey'));
+			var_dump($unitkey);
+			if($this->form_validation->run() == FALSE)
+			{
+				$this->json['cod'] = 2;
+				$this->json['msg'] = custom_errors(validation_errors());
+			}
 			$data = [
-				'act'					=> $act,
-				'kdprgrm'				=> '',
-				'nmprgrm'				=> '',
-				'curdShow'				=> $this->sip->curdShow('I')
+				'act'		=> $act,
+				'idjadwal'	=> $idjadwal,
+				'idvisi'	=> $idvisi,
+				'misikey'	=> $misikey,
+				'tujukey'	=> $tujukey,
+				'idsasaran'	=> $idsasaran,
+				'unitkey'	=> $unitkey,
+				'pgrmrkpdkey'	=> '',
+				'kdprgrm'	=> '',
+				'nmprgrm'	=> '',
+				'indikator'	=> '',
+				'length'	=> $r['TOTAL_ROW'],
+				'tahun'		=> $r['PERIODE_AWAL'],
+				'curdShow'	=> $this->sip->curdShow('I')
 			];
 		}
 		elseif($act == 'edit')
@@ -1228,6 +1242,112 @@ class Rpjmd extends CI_Controller {
             ];
 		}
 		$this->load->view('rpjmd/v_rpjmd_program_form', $data);
+	}
+
+	public function program_save($act)
+	{
+		if($act == 'add'){$this->sip->is_curd('I');}
+		elseif($act == 'edit'){$this->sip->is_curd('U');}
+		$this->load->library('form_validation');
+		try
+		{
+			$idjadwal 		= $this->input->post('i-idjadwal');
+			$idvisi 		= $this->input->post('i-idvisi');
+			$misikey 		= $this->input->post('i-misikey');
+			$tujukey		= $this->input->post('f-tujukey');
+			$idsasaran		= $this->input->post('f-idsasaran');
+			$idprogram		= $this->input->post('i-idprogram');
+			$program		= $this->input->post('i-program');
+			$indikator		= $this->input->post('i-indikator');
+			$unitkey		= $this->sip->unitkey($this->input->post('f-unitkey'));
+			$pgrmrkpdkey	= $this->input->post('i-pgrmrkpdkey');
+
+			$row = $this->db->query("
+				SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
+				LEFT JOIN VISI V ON V.ID_JADWAL = J.ID
+				LEFT JOIN MISI M ON M.IDVISI = V.IDVISI
+				LEFT JOIN TUJUAN T ON T.MISIKEY = M.MISIKEY
+				LEFT JOIN tbl_SASARAN S ON S.TUJUKEY = T.TUJUKEY
+				WHERE J.ID = '{$idjadwal}'
+				AND V.IDVISI = '{$idvisi}'
+				AND M.MISIKEY = '{$misikey}'
+				AND T.TUJUKEY = '{$tujukey}'
+				AND S.ID = '{$idsasaran}'"
+			)->row_array();
+			$r = settrim($row); 
+			
+			$tahun = $r['PERIODE_AWAL'];
+			if($act == 'add')
+			{
+				$newprogramkey	= $this->m_set->getNextKey('MPGRMRPJM');
+				$set = [
+					'ID'			=> $newprogramkey,
+					'ID_SASARAN'	=> '1',
+					'UNITKEY'		=> $unitkey,
+					'PGRMRKPDKEY'	=> $pgrmrkpdkey,
+					'INDIKATOR'		=> $indikator
+				];  
+
+				// for($i=0; $i<=$r['TOTAL_ROW']; $i++){
+				// 		$subset = [
+				// 		'ID_SASARAN'=> $newsasarankey,
+				// 		'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),
+				// 		'TARGET'	=> $this->input->post("i-target{$i}"),
+				// 		'SATUAN'	=> $this->input->post("i-satuan{$i}"),
+				// 		];
+				// 	$affected = $this->m_rpjmd->addSubSasaran($subset);
+				// }
+
+				$affected = $this->m_rpjmd->addProgram($set);
+				if($affected !== 1)
+				{
+					throw new Exception('Program gagal ditambahkan.', 2);
+				}
+				$this->m_set->updateNextKey('SASARAN', $newsasarankey);
+			}elseif($act == 'edit'){
+				$set = [
+					'NOSASARAN'	=> $nosasaran,
+					'SASARAN'	=> $sasaran,
+					'INDIKATOR'	=> $indikator
+				];
+
+				$where = [
+					'ID'		=> $idsasaran,
+					'TUJUKEY'	=> $tujukey,
+				];
+
+				$affected = $this->m_rpjmd->updateSasaran($where, $set);
+
+				for($i=0; $i<=$r['TOTAL_ROW']; $i++){
+						$subset = [
+							'TARGET'	=> $this->input->post("i-target{$i}"),
+							'SATUAN'	=> $this->input->post("i-satuan{$i}"),
+						];
+
+						$where = [
+							'ID_SASARAN'=> $idsasaran,
+							'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),	
+						];
+					$this->m_rpjmd->updateSubsasaran($where, $subset);
+				}
+
+				if($affected !== 1)
+				{
+					throw new Exception('Data Rekening Belanja Langsung gagal Dirubah.', 2);
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->db->trans_rollback();
+			$this->json['cod'] = $e->getCode();
+			$this->json['msg'] = $e->getMessage();
+		}
+
+		if($this->json['cod'] !== NULL)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
+		}
 	}
 }
 ?>

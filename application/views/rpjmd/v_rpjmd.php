@@ -718,7 +718,11 @@ $(function() {
         var act = $(this).data('act'),
             data, title, type;
 			data = {
-				
+				'f-idjadwal'	: getVal('#f-idjadwal'),
+				'f-idvisi'		: getVal('#f-idvisi'),
+				'f-misikey'		: getVal('#f-misikey'),
+				'f-tujukey'		: getVal('#f-tujukey'),
+				'f-idsasaran'	: getVal('#f-idsasaran')
 			};
         if(act == 'add') {
             title = 'Tambah Program';
