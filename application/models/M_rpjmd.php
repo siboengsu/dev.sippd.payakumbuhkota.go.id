@@ -188,4 +188,9 @@ class M_rpjmd extends CI_Model {
 		$this->db->insert('tbl_PROGRAM', $set);
 		return $this->db->affected_rows();
 	}
+
+	public function addSubProgram($subset = []){
+		$this->db->insert('tbl_SUBPROGRAM', $subset);
+		return $this->db->affected_rows();
+	}
 }

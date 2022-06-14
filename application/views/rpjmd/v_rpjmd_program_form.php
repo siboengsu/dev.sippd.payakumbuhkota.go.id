@@ -87,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						<input name="i-satuan<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
 					</div>
 					<div class="col-sm-4">
-						<input name="i-satuan<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
+						<input name="i-pagu<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
 					</div>
 				</div>
 			<?php } ?>

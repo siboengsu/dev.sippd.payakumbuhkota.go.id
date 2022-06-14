@@ -1288,15 +1288,16 @@ class Rpjmd extends CI_Controller {
 					'INDIKATOR'		=> $indikator
 				];  
 
-				// for($i=0; $i<=$r['TOTAL_ROW']; $i++){
-				// 		$subset = [
-				// 		'ID_SASARAN'=> $newsasarankey,
-				// 		'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),
-				// 		'TARGET'	=> $this->input->post("i-target{$i}"),
-				// 		'SATUAN'	=> $this->input->post("i-satuan{$i}"),
-				// 		];
-				// 	$affected = $this->m_rpjmd->addSubSasaran($subset);
-				// }
+				for($i=0; $i<=$r['TOTAL_ROW']; $i++){
+						$subset = [
+						'ID_PROGRAM'=> $newprogramkey,
+						'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),
+						'TARGET'	=> $this->input->post("i-target{$i}"),
+						'SATUAN'	=> $this->input->post("i-satuan{$i}"),
+						'PAGU'		=> $this->input->post("i-pagu{$i}"),
+						];
+					$affected = $this->m_rpjmd->addSubProgram($subset);
+				}
 
 				$affected = $this->m_rpjmd->addProgram($set);
 				if($affected !== 1)
