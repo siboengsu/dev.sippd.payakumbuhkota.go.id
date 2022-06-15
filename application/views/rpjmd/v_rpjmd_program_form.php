@@ -51,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Indikator Program (outcome)</label>
 				<div class="col-sm-10">
-					<textarea name="i-indikator" class="form-control" rows="5"><?php ?></textarea>
+					<textarea name="i-indikator" class="form-control" rows="5"><?php echo $indikator; ?></textarea>
 				</div>
 			</div>
 
@@ -73,7 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							<input name="i-satuan" class="form-control" rows="5" value="<?php ?>"></input>
 						</div>
 						<div class="col-sm-3">
-							<input name="i-satuan" class="form-control" rows="5" value="<?php ?>"></input>
+							<input name="i-pagu" class="form-control" rows="5" value="<?php ?>"></input>
 						</div>
 					</div>	
 				<?php } ?>

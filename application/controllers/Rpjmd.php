@@ -1132,7 +1132,7 @@ class Rpjmd extends CI_Controller {
 			<td class="text-left "><a href="javascript:void(0)" class=""><u><?php echo $r['NMPRGRM']; ?></u></a></td>
 			<td><?php echo $r['NMUNIT']; ?></td>
 			<td><?php echo $r['INDIKATOR']; ?></td>
-			<td class="text-center"><a href="javascript:void(0)" class="btn-sasaran-form" data-act="edit"><u>Edit</u></a></td>
+			<td class="text-center"><a href="javascript:void(0)" class="btn-program-form" data-act="edit"><u>Edit</u></a></td>
 			<td class="text-center">
 				<div class="checkbox checkbox-inline">
 					<input type="checkbox" name="i-check[]" value="<?php echo $r['ID']; ?>">
@@ -1166,14 +1166,15 @@ class Rpjmd extends CI_Controller {
 	public function program_form($act)
 	{
 		$this->load->library('form_validation');
-		$is_admin 	= $this->sip->is_admin();
-		$idjadwal 	= $this->input->post('f-idjadwal');
-		$idvisi 	= $this->input->post('f-idvisi');
-		$misikey 	= $this->input->post('f-misikey');
-		$tujukey 	= $this->input->post('f-tujukey');
-		$idsasaran 	= $this->input->post('f-idsasaran');
-		$unitkey 	= $this->sip->unitkey($this->input->post('f-unitkey'));
-		$pgrmrkpdkey = $this->input->post('f-pgrmrkpdkey');
+		$is_admin 		= $this->sip->is_admin();
+		$idjadwal 		= $this->input->post('f-idjadwal');
+		$idvisi 		= $this->input->post('f-idvisi');
+		$misikey 		= $this->input->post('f-misikey');
+		$tujukey 		= $this->input->post('f-tujukey');
+		$idsasaran 		= $this->input->post('f-idsasaran');
+		$unitkey 		= $this->sip->unitkey($this->input->post('f-unitkey'));
+		$pgrmrkpdkey 	= $this->input->post('f-pgrmrkpdkey');
+		$idprogram 		= $this->input->post('i-idprogram');
 
 		$row = $this->db->query("
 			SELECT J.PERIODE_AWAL, J.PERIODE_AKHIR, (J.PERIODE_AKHIR - J.PERIODE_AWAL) AS TOTAL_ROW FROM tbl_JADWAL J
@@ -1189,18 +1190,16 @@ class Rpjmd extends CI_Controller {
 		)->row_array();
 		$r = settrim($row);
 
-		// for($i=$r['PERIODE_AWAL']; $i<=$r['PERIODE_AKHIR']; $i++){
-		// 	$rowsasaran[] = $this->db->query("
-		// 		SELECT * FROM tbl_SASARAN S 
-		// 		LEFT JOIN tbl_SUBSASARAN SS ON SS.ID_SASARAN = S.ID
-		// 		WHERE S.ID = ? AND SS.TAHUN = ?",[$idsasaran,$i])->row_array();
-		// 	$rs = settrim($rowsasaran);
-		// }
+		for($i=$r['PERIODE_AWAL']; $i<=$r['PERIODE_AKHIR']; $i++){
+			$rowsasaran[] = $this->db->query("
+				SELECT * FROM tbl_PROGRAM P
+				LEFT JOIN tbl_SUBPROGRAM PP ON PP.ID_PROGRAM = P.ID
+				WHERE P.ID = ? AND PP.TAHUN = ?",[$idprogram,$i])->row_array();
+			$rs = settrim($rowsasaran);
+		}
 
 		if($act == 'add')
 		{
-			$unitkey = $this->sip->unitkey($this->input->post('l-unitkey'));
-			var_dump($unitkey);
 			if($this->form_validation->run() == FALSE)
 			{
 				$this->json['cod'] = 2;
@@ -1227,18 +1226,20 @@ class Rpjmd extends CI_Controller {
 		{
             $data = [
 				'act'					=> $act,
-				'idsasaran'				=> $idsasaran,
-				'idjadwal'				=> $idjadwal,
-				'idvisi'				=> $idvisi,
-				'misikey'				=> $misikey,
-				'tujukey'				=> $tujukey,
-				'nosasaran'				=> $rs[1]['NOSASARAN'],
-				'sasaran'				=> $rs[1]['SASARAN'],
-				'indikator'				=> $rs[1]['INDIKATOR'],
-				'length'				=> $r['TOTAL_ROW'],
-				'target'				=> $rs,
-				'tahun'					=> $r['PERIODE_AWAL'],
-				'curdShow'				=> $this->sip->curdShow('U')
+				'idjadwal'		=> $idjadwal,
+				'idvisi'		=> $idvisi,
+				'misikey'		=> $misikey,
+				'tujukey'		=> $tujukey,
+				'idsasaran'		=> $idsasaran,
+				'unitkey'		=> $unitkey,
+				'pgrmrkpdkey'	=> $pgrmrkpdkey,
+				'kdprgrm'		=> '',
+				'nmprgrm'		=> '',
+				'indikator'		=> $rs[1]['INDIKATOR'],
+				'length'		=> $r['TOTAL_ROW'],
+				'target'		=> $rs,
+				'tahun'			=> $r['PERIODE_AWAL'],
+				'curdShow'		=> $this->sip->curdShow('U')
             ];
 		}
 		$this->load->view('rpjmd/v_rpjmd_program_form', $data);
@@ -1255,7 +1256,7 @@ class Rpjmd extends CI_Controller {
 			$idvisi 		= $this->input->post('i-idvisi');
 			$misikey 		= $this->input->post('i-misikey');
 			$tujukey		= $this->input->post('f-tujukey');
-			$idsasaran		= $this->input->post('f-idsasaran');
+			$idsasaran		= $this->input->post('i-idsasaran');
 			$idprogram		= $this->input->post('i-idprogram');
 			$program		= $this->input->post('i-program');
 			$indikator		= $this->input->post('i-indikator');
@@ -1282,7 +1283,7 @@ class Rpjmd extends CI_Controller {
 				$newprogramkey	= $this->m_set->getNextKey('MPGRMRPJM');
 				$set = [
 					'ID'			=> $newprogramkey,
-					'ID_SASARAN'	=> '1',
+					'ID_SASARAN'	=> $idsasaran,
 					'UNITKEY'		=> $unitkey,
 					'PGRMRKPDKEY'	=> $pgrmrkpdkey,
 					'INDIKATOR'		=> $indikator
@@ -1304,7 +1305,7 @@ class Rpjmd extends CI_Controller {
 				{
 					throw new Exception('Program gagal ditambahkan.', 2);
 				}
-				$this->m_set->updateNextKey('SASARAN', $newsasarankey);
+				$this->m_set->updateNextKey('MPGRMRPJM', $newprogramkey);
 			}elseif($act == 'edit'){
 				$set = [
 					'NOSASARAN'	=> $nosasaran,
