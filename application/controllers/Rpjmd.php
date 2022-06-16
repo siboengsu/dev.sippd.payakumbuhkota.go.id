@@ -1218,6 +1218,7 @@ class Rpjmd extends CI_Controller {
 				'nmprgrm'	=> '',
 				'indikator'	=> '',
 				'length'	=> $r['TOTAL_ROW'],
+				'target'	=> $rs,
 				'tahun'		=> $r['PERIODE_AWAL'],
 				'curdShow'	=> $this->sip->curdShow('I')
 			];
@@ -1225,7 +1226,7 @@ class Rpjmd extends CI_Controller {
 		elseif($act == 'edit')
 		{
             $data = [
-				'act'					=> $act,
+				'act'			=> $act,
 				'idjadwal'		=> $idjadwal,
 				'idvisi'		=> $idvisi,
 				'misikey'		=> $misikey,
@@ -1234,7 +1235,7 @@ class Rpjmd extends CI_Controller {
 				'unitkey'		=> $unitkey,
 				'pgrmrkpdkey'	=> $pgrmrkpdkey,
 				'kdprgrm'		=> '',
-				'nmprgrm'		=> '',
+				'nmprgrm'		=> 'TTT',
 				'indikator'		=> $rs[1]['INDIKATOR'],
 				'length'		=> $r['TOTAL_ROW'],
 				'target'		=> $rs,

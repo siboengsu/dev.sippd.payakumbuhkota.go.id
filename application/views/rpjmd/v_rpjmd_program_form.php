@@ -79,15 +79,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				<?php } ?>
 				<div class="form-group">
 					<label class="col-sm-2 control-label"><?php echo $tahun+$i;?></label>
-					<input type="hidden" name="i-tahun<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
+					<input type="hidden" name="i-tahun<?php echo $i;?>" class="form-control" rows="5" value="<?php echo $target[$i]['TAHUN'];?>"></input>
 					<div class="col-sm-3">
-						<input name="i-target<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
+						<input name="i-target<?php echo $i;?>" class="form-control" rows="5" value="<?php echo $target[$i]['TARGET'];?>"></input>
 					</div>
 					<div class="col-sm-3">
-						<input name="i-satuan<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
+						<input name="i-satuan<?php echo $i;?>" class="form-control" rows="5" value="<?php echo $target[$i]['SATUAN'];?>"></input>
 					</div>
 					<div class="col-sm-4">
-						<input name="i-pagu<?php echo $i;?>" class="form-control" rows="5" value="<?php ?>"></input>
+						<input name="i-pagu<?php echo $i;?>" class="form-control" rows="5" value="<?php echo $target[$i]['PAGU'];?>"></input>
 					</div>
 				</div>
 			<?php } ?>
