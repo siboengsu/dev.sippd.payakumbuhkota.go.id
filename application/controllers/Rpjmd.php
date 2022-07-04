@@ -1101,6 +1101,61 @@ class Rpjmd extends CI_Controller {
 		}
 	}
 
+	public function subsasaran_load($page = 1, $first = FALSE){
+		$per_page = 12;	
+		$idsasaran = $this->input->post('d-idsasaran');
+		$filter = "AND ID_SASARAN = '{$idsasaran}'";
+		$total = $this->m_rpjmd->getSubSasaran($filter, NULL, TRUE)->row_array()['TOTAL_ROW'];
+		$rows = $this->m_rpjmd->getSubSasaran($filter, [$per_page, $page])->result_array();
+		while ($page > 1 AND count($rows) < 1):
+			$page--;
+			$rows = $this->m_rpjmd->getSubSasaran([$per_page, $page])->result_array();
+		endwhile;
+
+		$this->load->library('pagination');
+		$config = paginationBootstrap();
+		$config['base_url'] = site_url('dashboard/');
+		$config['per_page'] = $per_page;
+		$config['total_rows'] = (int) $total;
+		$this->pagination->initialize($config);
+	
+		if($first)
+		{
+			ob_start();
+		}
+
+		$type ='';
+		$i = 1;
+		foreach($rows as $r):
+		?>
+			<tr id="tr-subsasaran-<?php var_dump($rows); echo $r['ID_SASARAN']; ?>">
+			<td class="text-center"><a href="javascript:void(0)"><u><?php echo $r['TAHUN']; ?></u></a></td>
+			<td><?php echo $r['TARGET']; ?></td>
+			<td><?php echo $r['SATUAN']; ?></td>
+		</tr>
+		<?php endforeach; ?>
+		<tr class="hidden"><td class="pagetemp"><?php echo $this->pagination->create_links(); ?></td></tr>
+		<script>
+		$(function() {
+			$(blockSubSasaran + '.block-pagination').html($(blockSubSasaran + '.pagetemp').html());
+		});
+		$(function() {
+			$(document).off('click', blockSubSasaran + '.check-all');
+			$(document).on('click', blockSubSasaran + '.check-all', function(e) {
+				var checkboxes = $(blockSubSasaran + "input[name='i-check[]']:checkbox");
+				checkboxes.prop('checked', $(this).is(':checked')).not($(this)).change();
+			});
+		});
+		</script>
+		<?php
+		if($first)
+		{
+			$load = ob_get_contents();
+			ob_end_clean();
+			return $load;
+		}
+	}
+
 	public function program_load($page = 1, $first = FALSE){
 		$per_page = 12;	
 		$idsasaran = $this->input->post('f-idsasaran');
@@ -1129,7 +1184,7 @@ class Rpjmd extends CI_Controller {
 		foreach($rows as $r):
 		?>
 			<tr id="tr-program-<?php echo $r['ID']; ?>">
-			<td class="text-left "><a href="javascript:void(0)" class=""><u><?php echo $r['NMPRGRM']; ?></u></a></td>
+			<td class="text-left "><a href="javascript:void(0)" class="btn-show-subprogram"><u><?php echo $r['NMPRGRM']; ?></u></a></td>
 			<td><?php echo $r['NMUNIT']; ?></td>
 			<td><?php echo $r['INDIKATOR']; ?></td>
 			<td class="text-center"><a href="javascript:void(0)" class="btn-program-form" data-act="edit"><u>Edit</u></a></td>
@@ -1350,6 +1405,62 @@ class Rpjmd extends CI_Controller {
 		if($this->json['cod'] !== NULL)
 		{
 			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
+		}
+	}
+
+	public function subprogram_load($page = 1, $first = FALSE){
+		$per_page = 12;	
+		$idprogram = $this->input->post('f-idprogram');
+		$filter = "AND ID_PROGRAM = '{$idprogram}'";
+		$total = $this->m_rpjmd->getSubProgram($filter, NULL, TRUE)->row_array()['TOTAL_ROW'];
+		$rows = $this->m_rpjmd->getSubProgram($filter, [$per_page, $page])->result_array();
+		while ($page > 1 AND count($rows) < 1):
+			$page--;
+			$rows = $this->m_rpjmd->getSubProgram([$per_page, $page])->result_array();
+		endwhile;
+
+		$this->load->library('pagination');
+		$config = paginationBootstrap();
+		$config['base_url'] = site_url('dashboard/');
+		$config['per_page'] = $per_page;
+		$config['total_rows'] = (int) $total;
+		$this->pagination->initialize($config);
+	
+		if($first)
+		{
+			ob_start();
+		}
+
+		$type ='';
+		$i = 1;
+		foreach($rows as $r):
+		?>
+			<tr id="tr-subprogram-<?php echo $r['ID_PROGRAM']; ?>">
+			<td class="text-left "><a href="javascript:void(0)"><u><?php echo $r['TAHUN']; ?></u></a></td>
+			<td><?php echo $r['TARGET']; ?></td>
+			<td><?php echo $r['SATUAN']; ?></td>
+			<td><?php echo $r['PAGU']; ?></td>
+		</tr>
+		<?php endforeach; ?>
+		<tr class="hidden"><td class="pagetemp"><?php echo $this->pagination->create_links(); ?></td></tr>
+		<script>
+		$(function() {
+			$(blockSubProgram + '.block-pagination').html($(blockSubProgram + '.pagetemp').html());
+		});
+		$(function() {
+			$(document).off('click', blockSubProgram + '.check-all');
+			$(document).on('click', blockSubProgram + '.check-all', function(e) {
+				var checkboxes = $(blockSubProgram + "input[name='i-check[]']:checkbox");
+				checkboxes.prop('checked', $(this).is(':checked')).not($(this)).change();
+			});
+		});
+		</script>
+		<?php
+		if($first)
+		{
+			$load = ob_get_contents();
+			ob_end_clean();
+			return $load;
 		}
 	}
 }

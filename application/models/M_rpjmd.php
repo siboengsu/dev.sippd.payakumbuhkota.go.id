@@ -141,6 +141,18 @@ class M_rpjmd extends CI_Model {
 		return $this->db->query("SELECT * FROM ( SELECT ROW_NUMBER() OVER(ORDER BY ID ASC) AS ROWNUM, ID, NOSASARAN, SASARAN, INDIKATOR FROM tbl_SASARAN WHERE 1=1 {$filter}) X");}
 	}
 
+	public function getSubSasaran($filter = NULL, $offset = NULL, $count = FALSE){
+		if($count){
+			return $this->db->query("SELECT COUNT(ID_SASARAN) AS TOTAL_ROW FROM tbl_SUBSASARAN WHERE 1=1 {$filter} ");
+		}else{
+		if($offset !== NULL){
+			$page = $offset[1];
+			$limit = $offset[0];
+			$where = "WHERE X.ROWNUM BETWEEN (($page - 1) * $limit) + 1 AND $limit * ($page)";
+		}
+		return $this->db->query("SELECT * FROM ( SELECT ROW_NUMBER() OVER(ORDER BY ID_SASARAN ASC) AS ROWNUM, ID_SASARAN, TAHUN, TARGET, SATUAN FROM tbl_SUBSASARAN WHERE 1=1 {$filter}) X");}
+	}
+
 	public function addSasaran($set = []){
 		$this->db->insert('tbl_SASARAN', $set);
 		return $this->db->affected_rows();
@@ -189,8 +201,20 @@ class M_rpjmd extends CI_Model {
 		return $this->db->affected_rows();
 	}
 
-	public function addSubProgram($subset = []){
-		$this->db->insert('tbl_SUBPROGRAM', $subset);
+	public function addSubProgram($set = []){
+		$this->db->insert('tbl_SUBPROGRAM', $set);
 		return $this->db->affected_rows();
+	}
+
+	public function getSubProgram($filter = NULL, $offset = NULL, $count = FALSE){
+		if($count){ 
+			return $this->db->query("SELECT COUNT(ID_PROGRAM) AS TOTAL_ROW FROM tbl_SUBPROGRAM WHERE 1=1 {$filter} ");
+		}else{
+		if($offset !== NULL){
+			$page = $offset[1];
+			$limit = $offset[0];
+			$where = "WHERE X.ROWNUM BETWEEN (($page - 1) * $limit) + 1 AND $limit * ($page)";
+		}
+		return $this->db->query("SELECT * FROM ( SELECT ROW_NUMBER() OVER(ORDER BY ID_PROGRAM ASC) AS ROWNUM, ID_PROGRAM, TAHUN, TARGET, SATUAN, PAGU FROM tbl_SUBPROGRAM WHERE 1=1 {$filter}) X");}
 	}
 }

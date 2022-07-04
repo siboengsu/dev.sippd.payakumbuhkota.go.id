@@ -233,6 +233,39 @@
 	</div>
 </div>
 
+<div class="row blockSubSasaran">
+	<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="header-renja">
+				<h2 style='text-decoration: underline;'>
+					<i class='fa fa-info-circle' style='color:red'></i>
+					Sub Sasaran</h2>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading text-center text-bold">Draft Sub Sasaran</div>
+			<form class="form-inline form-load">
+				<input type="hidden" name="d-idsasaran" id="d-idsasaran">
+				<input type="hidden" value="1" class="page">
+			</form>
+			<form class="form-delete">
+                <div class="table-responsive">
+                    <table class="table table-condensed table-bordered table-striped f12">
+                        <tr>
+                            <th class="text-center w1px">Tahun</th>
+                            <th class="text-center text-nowrap">Target</th>
+							<th class="text-center text-nowrap">Satuan</th>
+                        </tr>
+                        <tbody class="data-load"></tbody>
+                    </table>
+                </div>
+			</form>
+		</div>
+	</div>
+</div>
+
 <div class="row blockProgram">
 	<div class="col-md-12">
 		<div class="row">
@@ -279,6 +312,40 @@
 		</div>
 	</div>
 </div>
+
+<div class="row blockSubProgram">
+	<div class="col-md-12">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="header-renja">
+				<h2 style='text-decoration: underline;'>
+					<i class='fa fa-info-circle' style='color:red'></i>
+					Sub Program</h2>
+				</div>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading text-center text-bold">Draft Sub Program</div>
+			<form class="form-inline form-load">
+				<input type="hidden" name="f-idprogram" id="f-idprogram">
+				<input type="hidden" value="1" class="page">
+			</form>
+			<form class="form-delete">
+                <div class="table-responsive">
+                    <table class="table table-condensed table-bordered table-striped f12">
+                        <tr>
+                            <th class="text-center w1px">Tahun</th>
+                            <th class="text-center text-nowrap">Target</th>
+							<th class="text-center text-nowrap">Satuan</th>
+							<th class="text-center text-nowrap">Pagu</th>
+                        </tr>
+                        <tbody class="data-load"></tbody>
+                    </table>
+                </div>
+			</form>
+		</div>
+	</div>
+</div>
 <script>
 
 var blockJadwal	= '.blockJadwal ',
@@ -286,10 +353,18 @@ blockVisi   	= '.blockVisi ',
 blockMisi       = '.blockMisi ',
 blockTujuan     = '.blockTujuan ',
 blockSasaran    = '.blockSasaran ',
-blockProgram    = '.blockProgram '
+blockSubSasaran = '.blockSubSasaran ',
+blockProgram    = '.blockProgram ',
+blockSubProgram = '.blockSubProgram '
 
 function dataLoadJadwal() {
 	$(blockVisi).hide();
+	$(blockMisi).hide();
+	$(blockTujuan).hide();
+	$(blockSasaran).hide();
+	$(blockSubSasaran).hide();
+	$(blockProgram).hide();
+	$(blockSubProgram).hide();
 	updateSelect(blockJadwal);
 	var page = $(blockJadwal + '.page').val();
 	$.post('/rpjmd/jadwal_load/' + page, $(blockJadwal + '.form-load').serializeArray(), function(res, status, xhr) {
@@ -304,6 +379,11 @@ window.onload=dataLoadJadwal();
 
 function dataLoadVisi() {
 	$(blockMisi).hide();
+	$(blockTujuan).hide();
+	$(blockSasaran).hide();
+	$(blockSubSasaran).hide();
+	$(blockProgram).hide();
+	$(blockSubProgram).hide();
 	updateSelect(blockVisi);
 	var page = $(blockVisi + '.page').val();
 	$.post('/rpjmd/visi_load/' + page, $(blockVisi + '.form-load').serializeArray(), function(res, status, xhr) {
@@ -318,6 +398,10 @@ window.onload=dataLoadVisi();
 
 function dataLoadMisi() {
 	$(blockTujuan).hide();
+	$(blockSasaran).hide();
+	$(blockSubSasaran).hide();
+	$(blockProgram).hide();
+	$(blockSubProgram).hide();
 	updateMask(blockMisi);
 	var page = $(blockMisi + '.page').val();
 	$.post('/rpjmd/misi_load/' + page, $(blockMisi + '.form-load').serializeArray(), function(res, status, xhr) {
@@ -332,6 +416,9 @@ window.onload=dataLoadMisi();
 
 function dataLoadTujuan() {
 	$(blockSasaran).hide();
+	$(blockSubSasaran).hide();
+	$(blockProgram).hide();
+	$(blockSubProgram).hide();
 	updateMask(blockTujuan);
 	var page = $(blockTujuan + '.page').val();
 	$.post('/rpjmd/tujuan_load/' + page, $(blockTujuan + '.form-load').serializeArray(), function(res, status, xhr) {
@@ -345,7 +432,9 @@ function dataLoadTujuan() {
 window.onload=dataLoadTujuan();
 
 function dataLoadSasaran() {
+	$(blockSubSasaran).hide();
 	$(blockProgram).hide();
+	$(blockSubProgram).hide();
 	updateMask(blockSasaran);
 	var page = $(blockSasaran + '.page').val();
 	$.post('/rpjmd/sasaran_load/' + page, $(blockSasaran + '.form-load').serializeArray(), function(res, status, xhr) {
@@ -356,9 +445,25 @@ function dataLoadSasaran() {
 		}
 	});
 }
+
 window.onload=dataLoadSasaran();
 
+function dataLoadSubSasaran() {
+	updateMask(blockSubSasaran);
+	var page = $(blockSubSasaran + '.page').val();
+	$.post('/rpjmd/subsasaran_load/' + page, $(blockSubSasaran + '.form-load').serializeArray(), function(res, status, xhr) {
+		if(contype(xhr) == 'json') {
+			respond(res);
+		} else {
+			$(blockSubSasaran + '.data-load').html(res);
+		}
+	});
+}
+
+window.onload=dataLoadSubSasaran();
+
 function dataLoadProgram() {
+	$(blockSubProgram).hide();
 	updateMask(blockProgram);
 	var page = $(blockProgram + '.page').val();
 	$.post('/rpjmd/program_load/' + page, $(blockProgram + '.form-load').serializeArray(), function(res, status, xhr) {
@@ -369,7 +474,22 @@ function dataLoadProgram() {
 		}
 	});
 }
+
 window.onload=dataLoadProgram();
+
+function dataLoadSubProgram() {
+	updateMask(blockSubProgram);
+	var page = $(blockSubProgram + '.page').val();
+	$.post('/rpjmd/subprogram_load/' + page, $(blockSubProgram + '.form-load').serializeArray(), function(res, status, xhr) {
+		if(contype(xhr) == 'json') {
+			respond(res);
+		} else {
+			$(blockSubProgram + '.data-load').html(res);
+		}
+	});
+}
+
+window.onload=dataLoadSubProgram();
 
 $(function() {
 	$(document).off('click', blockJadwal + '.btn-jadwal-form');
@@ -707,7 +827,10 @@ $(function() {
 		var id = $(this).closest('tr').find("input[name='i-check[]']:checkbox").val();
 		$(blockSasaran + '.btn-show-program').removeClass('text-bold text-success');
 		$(this).addClass('text-bold text-success');
+		$('#d-idsasaran').val(id);
 		$('#f-idsasaran').val(id);
+		$(blockSubSasaran).fadeIn('fast');
+		dataLoadSubSasaran();
 		$(blockProgram).fadeIn('fast');
 		dataLoadProgram();
 	});
@@ -745,5 +868,16 @@ $(function() {
         modalProgramForm.open();
         return false;
     });
+
+	$(document).off('click', blockProgram + '.btn-show-subprogram');
+	$(document).on('click', blockProgram + '.btn-show-subprogram', function(e) {
+		e.preventDefault();
+		var id = $(this).closest('tr').find("input[name='i-check[]']:checkbox").val();
+		$(blockProgram + '.btn-show-subprogram').removeClass('text-bold text-success');
+		$(this).addClass('text-bold text-success');
+		$('#f-idprogram').val(id);
+		$(blockSubProgram).fadeIn('fast');
+		dataLoadSubProgram();
+	});
 });
 </script>
