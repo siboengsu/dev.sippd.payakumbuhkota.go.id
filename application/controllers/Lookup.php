@@ -264,6 +264,59 @@ class Lookup extends CI_Controller {
 		$this->load->view('lookup/v_lookup_program', $data);
 	}
 
+	public function program2($act = '')
+	{
+		$unitkey = $this->sip->unitkey($this->input->post('l-unitkey'));
+
+		$data['setid'] = $this->input->post('setid');
+		$data['setkd'] = $this->input->post('setkd');
+		$data['setnm'] = $this->input->post('setnm');
+
+		$where = '';
+
+		if($act != 'all')
+		{
+			$where = "
+			AND MP.PGRMRKPDKEY NOT IN (
+				SELECT
+					PGRMRKPDKEY
+				FROM
+					tbl_PROGRAM
+			)";
+		}
+
+		$data['program'] = $this->db->query("
+		SELECT
+			MP.PGRMRKPDKEY,
+			ISNULL(D.NMUNIT, 'SEMUA URUSAN') AS NMUNIT,
+			ISNULL(D.KDUNIT, '0.00.') AS KDUNIT,
+			MP.NUPRGRM,
+			MP.NMPRGRM
+		FROM
+			MPGRMRKPD MP
+		LEFT JOIN DAFTUNIT D ON MP.UNITKEY = D.UNITKEY
+		WHERE
+			MP.KDTAHUN = '{$this->KDTAHUN}'
+		AND MP.TYPE = 'D'
+		AND (
+			MP.UNITKEY IS NULL
+			OR MP.UNITKEY IN (
+				SELECT
+					URUSKEY
+				FROM
+					URUSANUNIT
+				WHERE
+					UNITKEY = '{$unitkey}'
+			)
+		)
+		{$where}
+		ORDER BY
+			KDUNIT ASC,
+			NMPRGRM ASC")->result_array();
+
+		$this->load->view('lookup/v_lookup_program', $data);
+	}
+
 	public function kegiatan($act = '')
 	{
 		$data['unitkey'] = $this->sip->unitkey($this->input->post('l-unitkey'));

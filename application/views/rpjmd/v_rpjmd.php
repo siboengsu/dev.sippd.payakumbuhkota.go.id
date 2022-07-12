@@ -879,5 +879,33 @@ $(function() {
 		$(blockSubProgram).fadeIn('fast');
 		dataLoadSubProgram();
 	});
+
+	$(document).off('click', blockProgram + '.btn-program-delete');
+	$(document).on('click', blockProgram + '.btn-program-delete', function(e) {
+		e.preventDefault();
+		if($(blockProgram + ".form-delete input[name='i-check[]']:checkbox:checked").length < 1) {
+			return false;
+		}
+		var id = $(this).closest('tr').data('id');
+		goConfirm({
+			msg : 'Hapus Sasaran yang dipilih ?',
+			type: 'danger',
+			callback : function(ok) {
+				if(ok) {
+					var data = $.extend({},
+						$(blockProgram + '.form-delete').serializeObject()
+					);
+					$.post('/rpjmd/program_delete/', data, function(res, status, xhr) {
+						if(contype(xhr) == 'json') {
+							respond(res);
+						} else {
+							dataLoadProgram();
+						}
+					});
+				}
+			}
+		});
+		return false;
+	});
 });
 </script>

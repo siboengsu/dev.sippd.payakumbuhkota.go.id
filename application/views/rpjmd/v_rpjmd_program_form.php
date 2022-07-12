@@ -11,14 +11,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			<input id="i-misikey" type="hidden" name="i-misikey" value="<?php echo $misikey; ?>">
 			<input id="f-tujukey" type="hidden" name="f-tujukey" value="<?php echo $tujukey; ?>">
 			<input id="i-idsasaran" type="hidden" name="i-idsasaran" value="<?php echo $idsasaran; ?>">
-			<input id="f-idprogram" type="hidden" name="f-idprogram" value="<?php ?>">
+			<input id="i-idprogram" type="hidden" name="i-idprogram" value="<?php echo $idprogram; ?>">
 			<input type="hidden" value="1" class="page">
 
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Unit Organisasi</label>
 				<div class="col-sm-2">
 					<div class="input-group">
-						<input type="hidden" value="<?php echo $this->session->KDUNIT; ?>" id="f-unitkey" name="f-unitkey" class="form-control text-bold" placeholder="Kode Unit" readonly>
+						<input type="hidden" value="<?php echo $unitkey; ?>" id="f-unitkey" name="f-unitkey" class="form-control text-bold" placeholder="Kode Unit" readonly>
 					</div>
 				</div>
 				<div class="form-gap visible-xs-block"></div>
@@ -27,7 +27,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						<span class="input-group-btn">
 							<button type="button" class="btn btn-default btn-lookup-unit" data-setid="#f-unitkey" data-setkd="#v-kdunit" data-setnm="#v-nmunit"><i class="fa fa-folder-open"></i></button>
 						</span>
-						<input type="text" id="v-nmunit" value="<?php echo $this->session->NMUNIT; ?>" class="form-control text-bold" placeholder="Nama Unit" readonly>
+						<?php if($act == 'add'){?>
+							<input type="text" id="v-nmunit" value="<?php echo $this->session->NMUNIT; ?>" class="form-control text-bold" placeholder="Nama Unit" 
+							readonly>
+						<?php } ?>
+						<?php if($act == 'edit'){?>
+							<input type="text" id="v-nmunit" value="<?php echo $nmopd; ?>" class="form-control text-bold" placeholder="Nama Unit" 
+							readonly>
+						<?php } ?>
 					</div>
 				</div>
 			</div>
@@ -68,12 +75,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				<?php if($i==0){?>
 					<div class="form-group">
 						<label class="col-sm-2 control-label">Awal</label>
-						<input type="hidden" name="i-tahun" class="form-control" rows="5" value="<?php ?>"></input>
+						<input type="hidden" name="i-tahun" class="form-control" rows="5" value=""></input>
 						<div class="col-sm-3">
-							<input name="i-satuan" class="form-control" rows="5" value="<?php ?>"></input>
+							<input name="i-satuan" class="form-control" rows="5" value="<?php echo $target[$i]['TARGET']; ?>"></input>
 						</div>
 						<div class="col-sm-3">
-							<input name="i-pagu" class="form-control" rows="5" value="<?php ?>"></input>
+							<input name="i-pagu" class="form-control" rows="5" value="<?php echo $target[$i]['SATUAN']; ?>"></input>
 						</div>
 					</div>	
 				<?php } ?>
@@ -121,7 +128,7 @@ $(function() {
 			title: 'Lookup Program',
 			type: 'type-info',
 			size: 'size-wide',
-			message: $('<div></div>').load('/lookup/program/', data)
+			message: $('<div></div>').load('/lookup/program2/', data)
 		});
 		modalLookupProgram.open();
 

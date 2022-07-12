@@ -201,8 +201,8 @@ class M_rpjmd extends CI_Model {
 		return $this->db->affected_rows();
 	}
 
-	public function addSubProgram($set = []){
-		$this->db->insert('tbl_SUBPROGRAM', $set);
+	public function addSubProgram($subset = []){
+		$this->db->insert('tbl_SUBPROGRAM', $subset);
 		return $this->db->affected_rows();
 	}
 
@@ -216,5 +216,22 @@ class M_rpjmd extends CI_Model {
 			$where = "WHERE X.ROWNUM BETWEEN (($page - 1) * $limit) + 1 AND $limit * ($page)";
 		}
 		return $this->db->query("SELECT * FROM ( SELECT ROW_NUMBER() OVER(ORDER BY ID_PROGRAM ASC) AS ROWNUM, ID_PROGRAM, TAHUN, TARGET, SATUAN, PAGU FROM tbl_SUBPROGRAM WHERE 1=1 {$filter}) X");}
+	}
+
+	public function deleteProgram($idprogram){
+		$this->db->query("DELETE FROM tbl_PROGRAM WHERE ID IN ?",[$idprogram]);
+		$this->db->query("DELETE FROM tbl_SUBPROGRAM WHERE ID_PROGRAM IN ?",[$idprogram]);
+	}
+
+	public function updateProgram($where, $set = []){
+		$this->db->where($where);
+		$this->db->update('tbl_PROGRAM', $set);
+		return $this->db->affected_rows();
+	}
+
+	public function updateSubProgram($where, $subset = []){
+		$this->db->where($where);
+		$this->db->update('tbl_SUBPROGRAM', $subset);
+		return $this->db->affected_rows();
 	}
 }

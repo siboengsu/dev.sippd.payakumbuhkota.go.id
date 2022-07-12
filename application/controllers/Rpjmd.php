@@ -1245,6 +1245,21 @@ class Rpjmd extends CI_Controller {
 		)->row_array();
 		$r = settrim($row);
 
+		$unt = $this->db->query("
+			SELECT * FROM tbl_PROGRAM P
+			LEFT JOIN DAFTUNIT D ON D.UNITKEY = P.UNITKEY
+			WHERE P.ID = '{$idprogram}' 
+			AND D.TYPE = 'D'
+		")->row_array();
+		$u = settrim($unt);
+
+		$pgr = $this->db->query("
+			SELECT * FROM tbl_PROGRAM P
+			LEFT JOIN MPGRMRKPD MP ON MP.PGRMRKPDKEY = P.PGRMRKPDKEY
+			WHERE P.ID = '{$idprogram}'  AND KDTAHUN = 23
+		")->row_array();
+		$p = settrim($pgr);
+
 		for($i=$r['PERIODE_AWAL']; $i<=$r['PERIODE_AKHIR']; $i++){
 			$rowsasaran[] = $this->db->query("
 				SELECT * FROM tbl_PROGRAM P
@@ -1267,8 +1282,9 @@ class Rpjmd extends CI_Controller {
 				'misikey'	=> $misikey,
 				'tujukey'	=> $tujukey,
 				'idsasaran'	=> $idsasaran,
+				'idprogram'	=> '',
 				'unitkey'	=> $unitkey,
-				'pgrmrkpdkey'	=> '',
+				'pgrmrkpdkey' => '',
 				'kdprgrm'	=> '',
 				'nmprgrm'	=> '',
 				'indikator'	=> '',
@@ -1280,6 +1296,7 @@ class Rpjmd extends CI_Controller {
 		}
 		elseif($act == 'edit')
 		{
+			var_dump($pgrmrkpdkey);
             $data = [
 				'act'			=> $act,
 				'idjadwal'		=> $idjadwal,
@@ -1287,10 +1304,12 @@ class Rpjmd extends CI_Controller {
 				'misikey'		=> $misikey,
 				'tujukey'		=> $tujukey,
 				'idsasaran'		=> $idsasaran,
-				'unitkey'		=> $unitkey,
+				'idprogram'		=> $idprogram,
+				'unitkey'		=> $u['UNITKEY'],
+				'nmopd'			=> $u['NMUNIT'],
 				'pgrmrkpdkey'	=> $pgrmrkpdkey,
-				'kdprgrm'		=> '',
-				'nmprgrm'		=> 'TTT',
+				'kdprgrm'		=> $p['PGRMRKPDKEY'],
+				'nmprgrm'		=> $p['NMPRGRM'],
 				'indikator'		=> $rs[1]['INDIKATOR'],
 				'length'		=> $r['TOTAL_ROW'],
 				'target'		=> $rs,
@@ -1364,29 +1383,29 @@ class Rpjmd extends CI_Controller {
 				$this->m_set->updateNextKey('MPGRMRPJM', $newprogramkey);
 			}elseif($act == 'edit'){
 				$set = [
-					'NOSASARAN'	=> $nosasaran,
-					'SASARAN'	=> $sasaran,
-					'INDIKATOR'	=> $indikator
+					'INDIKATOR'		=> $indikator
 				];
 
 				$where = [
-					'ID'		=> $idsasaran,
-					'TUJUKEY'	=> $tujukey,
+					'ID_SASARAN' 	=> $idsasaran,
+					'ID'			=> $idprogram,
+					'UNITKEY'		=> $unitkey
 				];
 
-				$affected = $this->m_rpjmd->updateSasaran($where, $set);
+				$affected = $this->m_rpjmd->updateProgram($where, $set);
 
 				for($i=0; $i<=$r['TOTAL_ROW']; $i++){
 						$subset = [
 							'TARGET'	=> $this->input->post("i-target{$i}"),
 							'SATUAN'	=> $this->input->post("i-satuan{$i}"),
+							'PAGU'		=> $this->input->post("i-pagu{$i}"),
 						];
 
 						$where = [
-							'ID_SASARAN'=> $idsasaran,
+							'ID_PROGRAM'=> $idprogram,
 							'TAHUN'		=> (($r['PERIODE_AWAL'])+$i),	
 						];
-					$this->m_rpjmd->updateSubsasaran($where, $subset);
+					$this->m_rpjmd->updateSubProgram($where, $subset);
 				}
 
 				if($affected !== 1)
@@ -1461,6 +1480,31 @@ class Rpjmd extends CI_Controller {
 			$load = ob_get_contents();
 			ob_end_clean();
 			return $load;
+		}
+	}
+
+	public function program_delete(){
+		$this->sip->is_curd('D');
+		$this->load->library('form_validation');
+		try
+		{
+			$idprogram = $this->input->post('i-check[]');
+			$this->m_rpjmd->deleteProgram($idprogram);
+			$affected = $this->db->affected_rows();
+			if($affected < 1)
+			{
+				throw new Exception('Tujuan gagal dihapus.', 2);
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->db->trans_rollback();
+			$this->json['cod'] = $e->getCode();
+			$this->json['msg'] = $e->getMessage();
+		}
+		if($this->json['cod'] !== NULL)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode($this->json));
 		}
 	}
 }
